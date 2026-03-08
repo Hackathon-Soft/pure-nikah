@@ -150,7 +150,7 @@ const CreateProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<ProfileFormData>({
-    resolver: zodResolver(fullProfileSchema),
+    resolver: yupResolver(fullProfileSchema) as any,
     defaultValues: {
       firstName: "",
       lastName: "",
