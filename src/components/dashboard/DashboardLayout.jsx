@@ -1,10 +1,21 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import { Outlet, Link } from "react-router-dom";
-import { FiBell } from "react-icons/fi";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { FiBell, FiLogOut } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardLayout = () => {
+  const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const initial = profile?.first_name?.charAt(0)?.toUpperCase() || "U";
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -22,8 +33,11 @@ const DashboardLayout = () => {
                   <FiBell style={{ fontSize: "var(--size-icon)" }} />
                 </Link>
               </Button>
+              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
+                <FiLogOut style={{ fontSize: "var(--size-icon)" }} />
+              </Button>
               <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">
-                A
+                {initial}
               </div>
             </div>
           </header>

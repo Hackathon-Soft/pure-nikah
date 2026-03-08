@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const registerSchema = yup.object({
   name: yup.string().min(2, "Name must be at least 2 characters").max(100).required("Name is required"),
@@ -22,11 +23,22 @@ const registerSchema = yup.object({
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm({ resolver: yupResolver(registerSchema) });
 
-  const onSubmit = (data) => {
-    toast({ title: "Registration", description: "Authentication requires backend. Connect Lovable Cloud to enable registration." });
+  const onSubmit = async (data) => {
+    const { error } = await signUp(data.email, data.password, {
+      name: data.name,
+      gender: data.gender,
+    });
+    if (error) {
+      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Account created!", description: "Please check your email to verify your account." });
+      navigate("/verify-email");
+    }
   };
 
   return (
@@ -59,7 +71,9 @@ const Register = () => {
           {errors.password && <p className="form-error">{errors.password.message}</p>}
         </div>
         <div><Label htmlFor="confirmPassword">Confirm Password</Label><Input id="confirmPassword" type="password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />{errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}</div>
-        <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>Create Account</Button>
+        <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account..." : "Create Account"}
+        </Button>
       </form>
       <p className="text-center text-token-sm text-muted-foreground mt-token-6">Already have an account?{" "}<Link to="/login" className="link-primary">Sign In</Link></p>
     </motion.div>

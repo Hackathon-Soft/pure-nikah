@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = yup.object({
   email: yup.string().email("Please enter a valid email").required("Email is required"),
@@ -18,6 +19,8 @@ const loginSchema = yup.object({
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -25,8 +28,14 @@ const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: yupResolver(loginSchema) });
 
-  const onSubmit = (data) => {
-    toast({ title: "Sign in", description: "Authentication requires backend. Connect Lovable Cloud to enable login." });
+  const onSubmit = async (data) => {
+    const { error } = await signIn(data.email, data.password);
+    if (error) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Welcome back!", description: "You have been signed in successfully." });
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -54,7 +63,9 @@ const Login = () => {
         <div className="flex justify-end">
           <Link to="/forgot-password" className="text-token-xs link-primary">Forgot Password?</Link>
         </div>
-        <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>Sign In</Button>
+        <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Signing in..." : "Sign In"}
+        </Button>
       </form>
       <p className="text-center text-token-sm text-muted-foreground mt-token-6">
         Don't have an account?{" "}
