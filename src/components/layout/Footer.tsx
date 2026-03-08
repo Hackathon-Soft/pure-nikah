@@ -25,9 +25,9 @@ const Footer = () => (
         <div>
           <h4 className="font-display font-semibold mb-token-4">Support</h4>
           <div className="flex flex-col gap-token-2 text-token-sm text-background/60">
-            <span className="hover:text-accent transition-colors cursor-pointer">Help Center</span>
-            <span className="hover:text-accent transition-colors cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-accent transition-colors cursor-pointer">Terms of Service</span>
+            <Link to="/help" className="hover:text-accent transition-colors">Help Center</Link>
+            <Link to="/privacy-policy" className="hover:text-accent transition-colors">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-accent transition-colors">Terms of Service</Link>
           </div>
         </div>
         <div>

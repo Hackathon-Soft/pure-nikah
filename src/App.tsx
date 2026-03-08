@@ -14,6 +14,9 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Verification from "./pages/Verification";
 import VerificationStatus from "./pages/VerificationStatus";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 
 import AuthLayout from "./components/layout/AuthLayout";
@@ -50,6 +53,9 @@ const App = () => (
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/verification" element={<Verification />} />
             <Route path="/verification-status" element={<VerificationStatus />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/help" element={<HelpCenter />} />
           </Route>
 
           {/* Dashboard */}
