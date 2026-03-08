@@ -9,6 +9,8 @@ import {
   FiStar, FiEdit, FiCamera, FiFlag, FiBriefcase, FiClock, FiCheckCircle,
   FiCalendar, FiGlobe, FiHome, FiUsers,
 } from "react-icons/fi";
+import { calculateCompatibility } from "@/lib/compatibility";
+import { CompatibilityBadge } from "@/components/CompatibilityBadge";
 
 const profile = {
   name: "Ahmed Khan",
@@ -86,6 +88,19 @@ const InfoGrid = ({ items }) => (
   </div>
 );
 
+const myPreferences = {
+  ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
+  education: "Bachelors", religiosity: "Practicing", maritalStatus: "Any", preferVerified: true,
+};
+
+const candidateData = {
+  age: profile.age, city: profile.city, sect: "Sunni", cast: "Rajput",
+  education: "Masters", religiosity: "Practicing", maritalStatus: profile.maritalStatus,
+  verified: profile.verified,
+};
+
+const compatibilityScore = calculateCompatibility(myPreferences, candidateData);
+
 const ProfileView = () => {
   return (
     <div className="p-token-4 md:p-token-8 max-w-4xl space-y-6">
@@ -104,6 +119,16 @@ const ProfileView = () => {
                     <FiCheckCircle className="text-primary-foreground" style={{ fontSize: "var(--text-xs)" }} />
                   </div>
                 )}
+              </div>
+
+              {/* Compatibility Badge */}
+              <div className="mx-auto sm:mx-0">
+                <CompatibilityBadge
+                  score={compatibilityScore}
+                  preferences={myPreferences}
+                  candidate={candidateData}
+                  size="lg"
+                />
               </div>
 
               {/* Info */}
