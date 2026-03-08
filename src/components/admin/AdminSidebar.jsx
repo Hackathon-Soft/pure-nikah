@@ -1,0 +1,47 @@
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { NavLink } from "@/components/NavLink";
+import { useLocation } from "react-router-dom";
+import { FiHome, FiUsers, FiCheckCircle, FiAlertTriangle, FiBarChart2 } from "react-icons/fi";
+
+const items = [
+  { title: "Overview", url: "/admin", icon: FiHome },
+  { title: "Users", url: "/admin/users", icon: FiUsers },
+  { title: "Verification", url: "/admin/verification", icon: FiCheckCircle },
+  { title: "Reports", url: "/admin/reports", icon: FiAlertTriangle },
+];
+
+export function AdminSidebar() {
+  const location = useLocation();
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Admin</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end={item.url === "/admin"}
+                      className="hover:bg-muted/50"
+                      activeClassName="bg-muted text-primary font-medium"
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+}
