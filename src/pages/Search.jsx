@@ -7,16 +7,31 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { FiSearch, FiMapPin, FiBookOpen, FiHeart, FiFilter, FiShield } from "react-icons/fi";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { calculateCompatibility } from "@/lib/compatibility";
+import { CompatibilityBadge } from "@/components/CompatibilityBadge";
 
 const mockProfiles = [
-  { id: 1, name: "Ahmed K.", age: 28, location: "Lahore, Pakistan", city: "Lahore", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Rajput", gender: "male", verified: true, distance: "2 km" },
-  { id: 2, name: "Fatima A.", age: 25, location: "Karachi, Pakistan", city: "Karachi", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Syed", gender: "female", verified: true, distance: "5 km" },
-  { id: 3, name: "Yusuf M.", age: 31, location: "Islamabad, Pakistan", city: "Islamabad", education: "PhD", religiosity: "Practicing", sect: "Sunni", cast: "Mughal", gender: "male", verified: false, distance: "15 km" },
-  { id: 4, name: "Aisha R.", age: 24, location: "Rawalpindi, Pakistan", city: "Rawalpindi", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Arain", gender: "female", verified: true, distance: "8 km" },
-  { id: 5, name: "Omar H.", age: 30, location: "Faisalabad, Pakistan", city: "Faisalabad", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Jat", gender: "male", verified: true, distance: "25 km" },
-  { id: 6, name: "Maryam S.", age: 27, location: "Multan, Pakistan", city: "Multan", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Sheikh", gender: "female", verified: false, distance: "50 km" },
+  { id: 1, name: "Ahmed K.", age: 28, location: "Lahore, Pakistan", city: "Lahore", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Rajput", gender: "male", verified: true, distance: "2 km", maritalStatus: "Never Married" },
+  { id: 2, name: "Fatima A.", age: 25, location: "Karachi, Pakistan", city: "Karachi", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Syed", gender: "female", verified: true, distance: "5 km", maritalStatus: "Never Married" },
+  { id: 3, name: "Yusuf M.", age: 31, location: "Islamabad, Pakistan", city: "Islamabad", education: "PhD", religiosity: "Practicing", sect: "Sunni", cast: "Mughal", gender: "male", verified: false, distance: "15 km", maritalStatus: "Divorced" },
+  { id: 4, name: "Aisha R.", age: 24, location: "Rawalpindi, Pakistan", city: "Rawalpindi", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Arain", gender: "female", verified: true, distance: "8 km", maritalStatus: "Never Married" },
+  { id: 5, name: "Omar H.", age: 30, location: "Faisalabad, Pakistan", city: "Faisalabad", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Jat", gender: "male", verified: true, distance: "25 km", maritalStatus: "Widowed" },
+  { id: 6, name: "Maryam S.", age: 27, location: "Multan, Pakistan", city: "Multan", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Sheikh", gender: "female", verified: false, distance: "50 km", maritalStatus: "Never Married" },
 ];
+
+// Simulated current user preferences
+const myPreferences = {
+  ageMin: 22,
+  ageMax: 30,
+  city: "Lahore",
+  sect: "Sunni",
+  cast: "Any",
+  education: "Bachelors",
+  religiosity: "Practicing",
+  maritalStatus: "Any",
+  preferVerified: true,
+};
 
 const cities = ["Any", "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta"];
 const castes = ["Any", "Syed", "Rajput", "Mughal", "Arain", "Jat", "Sheikh", "Pathan", "Baloch", "Malik", "Other"];
@@ -36,6 +51,13 @@ const SearchPage = () => {
     if (p.age < ageRange[0] || p.age > ageRange[1]) return false;
     return true;
   });
+
+  // Calculate compatibility for each profile and sort by score
+  const withScores = useMemo(() => {
+    return filtered
+      .map((p) => ({ ...p, compatibility: calculateCompatibility(myPreferences, p) }))
+      .sort((a, b) => b.compatibility - a.compatibility);
+  }, [filtered]);
 
   return (
     <div className="min-h-screen bg-muted islamic-pattern">
@@ -101,10 +123,10 @@ const SearchPage = () => {
           </motion.div>
         )}
 
-        <p className="text-token-sm text-muted-foreground mb-token-4">Showing {filtered.length} proposals</p>
+        <p className="text-token-sm text-muted-foreground mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-token-6">
-          {filtered.map((profile, i) => (
+          {withScores.map((profile, i) => (
             <motion.div key={profile.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
               <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
                 <div className="h-32 bg-gradient-primary relative">
@@ -113,6 +135,15 @@ const SearchPage = () => {
                       <FiShield style={{ fontSize: "var(--text-xs)" }} /> Verified
                     </div>
                   )}
+                  {/* Compatibility badge — top left */}
+                  <div className="absolute top-3 left-3">
+                    <CompatibilityBadge
+                      score={profile.compatibility}
+                      preferences={myPreferences}
+                      candidate={profile}
+                      size="sm"
+                    />
+                  </div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[var(--size-avatar)] h-[var(--size-avatar)] rounded-full bg-card border-4 border-card flex items-center justify-center">
                     <span className="text-token-2xl font-display font-bold text-primary">{profile.name.charAt(0)}</span>
                   </div>
