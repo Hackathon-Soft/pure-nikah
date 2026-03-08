@@ -30,55 +30,49 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted islamic-pattern px-token-4">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-card rounded-2xl shadow-elevated border border-border p-token-8"
-      >
-        <div className="text-center mb-token-8">
-          <Link to="/" className="inline-flex items-center gap-token-2 mb-token-4">
-            <FaHeart className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} />
-            <span className="font-display text-token-2xl font-bold text-foreground">PureNikah</span>
-          </Link>
-          <h1 className="font-display text-token-2xl font-bold text-foreground">Forgot Password</h1>
-          <p className="text-muted-foreground text-token-sm mt-token-1">
-            Enter your email to receive a reset link
-          </p>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-md bg-card rounded-2xl shadow-elevated border border-border p-token-8"
+    >
+      <div className="text-center mb-token-8">
+        <h1 className="font-display text-token-2xl font-bold text-foreground">Forgot Password</h1>
+        <p className="text-muted-foreground text-token-sm mt-token-1">
+          Enter your email to receive a reset link
+        </p>
+      </div>
 
-        {sent ? (
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <FiMail className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} />
-            </div>
-            <p className="text-muted-foreground text-token-sm">
-              We've sent a password reset link to your email. Please check your inbox and follow the instructions.
-            </p>
-            <Button variant="outline" asChild className="w-full">
-              <Link to="/login">
-                <FiArrowLeft className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} />
-                Back to Sign In
-              </Link>
-            </Button>
+      {sent ? (
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+            <FiMail className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
-              {errors.email && <p className="text-token-sm text-destructive mt-token-1">{errors.email.message}</p>}
-            </div>
-            <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
-              Send Reset Link
-            </Button>
-            <Link to="/login" className="flex items-center justify-center gap-token-2 text-token-sm text-muted-foreground hover:text-primary transition-colors">
-              <FiArrowLeft style={{ fontSize: "var(--size-icon-sm)" }} /> Back to Sign In
+          <p className="text-muted-foreground text-token-sm">
+            We've sent a password reset link to your email. Please check your inbox and follow the instructions.
+          </p>
+          <Button variant="outline" asChild className="w-full">
+            <Link to="/login">
+              <FiArrowLeft className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} />
+              Back to Sign In
             </Link>
-          </form>
-        )}
-      </motion.div>
-    </div>
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Label htmlFor="email">Email Address</Label>
+            <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
+            {errors.email && <p className="text-token-sm text-destructive mt-token-1">{errors.email.message}</p>}
+          </div>
+          <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
+            Send Reset Link
+          </Button>
+          <Link to="/login" className="flex items-center justify-center gap-token-2 text-token-sm text-muted-foreground hover:text-primary transition-colors">
+            <FiArrowLeft style={{ fontSize: "var(--size-icon-sm)" }} /> Back to Sign In
+          </Link>
+        </form>
+      )}
+    </motion.div>
   );
 };
 
