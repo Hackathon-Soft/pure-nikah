@@ -15,7 +15,9 @@ const schema = yup.object({
   email: yup.string().email("Please enter a valid email").max(255).required("Email is required"),
 });
 
-type FormData = yup.InferType<typeof schema>;
+type FormData = {
+  email: string;
+};
 
 const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
