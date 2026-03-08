@@ -299,6 +299,7 @@ const Verification = () => {
               </form>
             </motion.div>
           )}
+    </div>
   );
 };
 

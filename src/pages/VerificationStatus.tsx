@@ -132,6 +132,7 @@ const VerificationStatus = () => {
               </Button>
             </div>
           </motion.div>
+    </div>
   );
 };
 
