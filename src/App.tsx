@@ -63,8 +63,9 @@ const App = () => (
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<ProfileView />} />
-            <Route path="edit-profile" element={<ProfileView />} />
-            <Route path="photos" element={<ProfileView />} />
+            <Route path="create-profile" element={<CreateProfile />} />
+            <Route path="edit-profile" element={<CreateProfile />} />
+            <Route path="photos" element={<CreateProfile />} />
             <Route path="preferences" element={<Settings />} />
             <Route path="search" element={<Search />} />
             <Route path="nearby" element={<Search />} />
