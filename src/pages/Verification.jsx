@@ -49,13 +49,13 @@ const Verification = () => {
   return (
     <div className="w-full max-w-2xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">Identity Verification</h1>
+        <h1 className="page-title mb-token-2">Identity Verification</h1>
         <p className="text-muted-foreground mb-token-8">Verify your identity to build trust and prevent spam. Verification is reviewed by our team and expires every 6 months.</p>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={`${sConfig.bg} rounded-xl p-token-6 mb-token-8 flex items-center gap-token-4`}>
         <div className={sConfig.color}>{sConfig.icon}</div>
         <div>
-          <h3 className={`font-display text-token-lg font-semibold ${sConfig.color}`}>{sConfig.label}</h3>
+          <h3 className={`card-section-title ${sConfig.color}`}>{sConfig.label}</h3>
           <p className="text-token-sm text-muted-foreground mt-token-1">
             {status === "not_submitted" && "Submit your documents to get verified."}
             {status === "pending" && "Our team is reviewing your documents. This usually takes 24-48 hours."}
@@ -65,28 +65,28 @@ const Verification = () => {
           </p>
         </div>
       </motion.div>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card rounded-xl border border-border p-token-6 mb-token-8">
-        <h2 className="font-display text-token-xl font-semibold text-foreground mb-token-4">How Verification Works</h2>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="card-base p-token-6 mb-token-8">
+        <h2 className="card-section-title text-token-xl mb-token-4">How Verification Works</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-token-4">
           {[{ icon: <HiOutlineIdentification style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Submit CNIC", desc: "Upload front & back of your CNIC/ID card" },{ icon: <FiCamera style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Take Selfie", desc: "Selfie holding your CNIC for verification" },{ icon: <FiUser style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Human Review", desc: "Our team verifies within 24-48 hours" }].map((step, i) => (
-            <div key={i} className="text-center p-token-4"><div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-token-3 text-primary">{step.icon}</div><h4 className="font-display text-token-sm font-semibold text-foreground">{step.title}</h4><p className="text-token-xs text-muted-foreground mt-token-1">{step.desc}</p></div>
+            <div key={i} className="text-center p-token-4"><div className="icon-box w-12 h-12 rounded-full mx-auto mb-token-3"><span className="text-primary">{step.icon}</span></div><h4 className="font-display text-token-sm font-semibold text-foreground">{step.title}</h4><p className="text-token-xs text-muted-foreground mt-token-1">{step.desc}</p></div>
           ))}
         </div>
       </motion.div>
       {canSubmit && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl border border-border shadow-card p-token-6">
-          <h2 className="font-display text-token-xl font-semibold text-foreground mb-token-6">Submit Your Documents</h2>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card-base p-token-6">
+          <h2 className="card-section-title text-token-xl mb-token-6">Submit Your Documents</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div><Label htmlFor="cnicNumber">CNIC Number</Label><Input id="cnicNumber" placeholder="12345-1234567-1" {...register("cnicNumber")} className="mt-token-1" />{errors.cnicNumber && <p className="text-token-sm text-destructive mt-token-1">{errors.cnicNumber.message}</p>}</div>
-            <div><Label htmlFor="fullName">Full Name (as per CNIC)</Label><Input id="fullName" placeholder="Muhammad Ahmed Khan" {...register("fullName")} className="mt-token-1" />{errors.fullName && <p className="text-token-sm text-destructive mt-token-1">{errors.fullName.message}</p>}</div>
-            <div><Label htmlFor="fatherName">Father's Name (as per CNIC)</Label><Input id="fatherName" placeholder="Muhammad Khan" {...register("fatherName")} className="mt-token-1" />{errors.fatherName && <p className="text-token-sm text-destructive mt-token-1">{errors.fatherName.message}</p>}</div>
+            <div><Label htmlFor="cnicNumber">CNIC Number</Label><Input id="cnicNumber" placeholder="12345-1234567-1" {...register("cnicNumber")} className="mt-token-1" />{errors.cnicNumber && <p className="form-error">{errors.cnicNumber.message}</p>}</div>
+            <div><Label htmlFor="fullName">Full Name (as per CNIC)</Label><Input id="fullName" placeholder="Muhammad Ahmed Khan" {...register("fullName")} className="mt-token-1" />{errors.fullName && <p className="form-error">{errors.fullName.message}</p>}</div>
+            <div><Label htmlFor="fatherName">Father's Name (as per CNIC)</Label><Input id="fatherName" placeholder="Muhammad Khan" {...register("fatherName")} className="mt-token-1" />{errors.fatherName && <p className="form-error">{errors.fatherName.message}</p>}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-token-4">
-              <div><Label htmlFor="dateOfBirth">Date of Birth</Label><Input id="dateOfBirth" type="date" {...register("dateOfBirth")} className="mt-token-1" />{errors.dateOfBirth && <p className="text-token-sm text-destructive mt-token-1">{errors.dateOfBirth.message}</p>}</div>
-              <div><Label htmlFor="phoneNumber">Phone Number</Label><Input id="phoneNumber" placeholder="+923001234567" {...register("phoneNumber")} className="mt-token-1" />{errors.phoneNumber && <p className="text-token-sm text-destructive mt-token-1">{errors.phoneNumber.message}</p>}</div>
+              <div><Label htmlFor="dateOfBirth">Date of Birth</Label><Input id="dateOfBirth" type="date" {...register("dateOfBirth")} className="mt-token-1" />{errors.dateOfBirth && <p className="form-error">{errors.dateOfBirth.message}</p>}</div>
+              <div><Label htmlFor="phoneNumber">Phone Number</Label><Input id="phoneNumber" placeholder="+923001234567" {...register("phoneNumber")} className="mt-token-1" />{errors.phoneNumber && <p className="form-error">{errors.phoneNumber.message}</p>}</div>
             </div>
-            <div><Label htmlFor="address">Address (as per CNIC)</Label><Input id="address" placeholder="House #, Street, City, Province" {...register("address")} className="mt-token-1" />{errors.address && <p className="text-token-sm text-destructive mt-token-1">{errors.address.message}</p>}</div>
+            <div><Label htmlFor="address">Address (as per CNIC)</Label><Input id="address" placeholder="House #, Street, City, Province" {...register("address")} className="mt-token-1" />{errors.address && <p className="form-error">{errors.address.message}</p>}</div>
             <div className="border-t border-border pt-token-5">
-              <h3 className="font-display text-token-lg font-semibold text-foreground mb-token-4">Document Uploads</h3>
+              <h3 className="card-section-title mb-token-4">Document Uploads</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-token-4 mb-token-4">
                 <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-token-6 cursor-pointer transition-colors ${cnicFront ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                   <FiUpload className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{cnicFront ? cnicFront.name : "CNIC Front"}</span><span className="text-token-xs text-muted-foreground mt-token-1">JPG, PNG (max 5MB)</span>

@@ -35,30 +35,30 @@ const HelpCenter = () => {
   return (
     <div className="w-full max-w-3xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">Help Center</h1>
-        <p className="text-muted-foreground text-token-sm mb-token-8">Find answers to common questions or contact our support team.</p>
+        <h1 className="page-title mb-token-2">Help Center</h1>
+        <p className="page-subtitle mb-token-8">Find answers to common questions or contact our support team.</p>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid grid-cols-1 sm:grid-cols-3 gap-token-4 mb-token-8">
         {[{ icon: <FiHelpCircle style={{ fontSize: "var(--size-icon-lg)" }} />, label: "FAQs", desc: "Common questions" },{ icon: <FiMail style={{ fontSize: "var(--size-icon-lg)" }} />, label: "Email Us", desc: "support@purenikah.com" },{ icon: <FiMessageCircle style={{ fontSize: "var(--size-icon-lg)" }} />, label: "Response Time", desc: "Within 24 hours" }].map((item, i) => (
-          <div key={i} className="bg-card rounded-xl border border-border p-token-4 text-center"><div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto mb-token-2">{item.icon}</div><h3 className="font-display text-token-sm font-semibold text-foreground">{item.label}</h3><p className="text-token-xs text-muted-foreground">{item.desc}</p></div>
+          <div key={i} className="card-base p-token-4 text-center"><div className="icon-box w-10 h-10 rounded-full mx-auto mb-token-2"><span className="text-primary">{item.icon}</span></div><h3 className="font-display text-token-sm font-semibold text-foreground">{item.label}</h3><p className="text-token-xs text-muted-foreground">{item.desc}</p></div>
         ))}
       </motion.div>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border p-token-6 mb-token-8">
-        <div className="flex items-center gap-token-3 mb-token-4"><FiBook className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} /><h2 className="font-display text-token-xl font-semibold text-foreground">Frequently Asked Questions</h2></div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-base p-token-6 mb-token-8">
+        <div className="flex items-center gap-token-3 mb-token-4"><FiBook className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} /><h2 className="card-section-title text-token-xl">Frequently Asked Questions</h2></div>
         <div className="space-y-4">{faqs.map((faq, i) => (<div key={i} className="border-b border-border pb-token-4 last:border-0 last:pb-0"><h4 className="text-token-sm font-medium text-foreground mb-token-1">{faq.q}</h4><p className="text-token-sm text-muted-foreground">{faq.a}</p></div>))}</div>
       </motion.div>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card rounded-xl border border-border p-token-6">
-        <h2 className="font-display text-token-xl font-semibold text-foreground mb-token-4">Contact Support</h2>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="card-base p-token-6">
+        <h2 className="card-section-title text-token-xl mb-token-4">Contact Support</h2>
         {sent ? (
-          <div className="text-center py-token-8"><div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-token-4"><FiSend className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} /></div><h3 className="font-display text-token-lg font-semibold text-foreground mb-token-2">Message Sent!</h3><p className="text-token-sm text-muted-foreground mb-token-4">We'll get back to you within 24 hours.</p><Button variant="outline" onClick={() => setSent(false)}>Send Another Message</Button></div>
+          <div className="text-center py-token-8"><div className="icon-box w-16 h-16 rounded-full mx-auto mb-token-4"><FiSend className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} /></div><h3 className="card-section-title mb-token-2">Message Sent!</h3><p className="text-token-sm text-muted-foreground mb-token-4">We'll get back to you within 24 hours.</p><Button variant="outline" onClick={() => setSent(false)}>Send Another Message</Button></div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-token-4">
-              <div><Label htmlFor="name">Name</Label><Input id="name" placeholder="Your name" {...register("name")} className="mt-token-1" />{errors.name && <p className="text-token-sm text-destructive mt-token-1">{errors.name.message}</p>}</div>
-              <div><Label htmlFor="email">Email</Label><Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />{errors.email && <p className="text-token-sm text-destructive mt-token-1">{errors.email.message}</p>}</div>
+              <div><Label htmlFor="name">Name</Label><Input id="name" placeholder="Your name" {...register("name")} className="mt-token-1" />{errors.name && <p className="form-error">{errors.name.message}</p>}</div>
+              <div><Label htmlFor="email">Email</Label><Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />{errors.email && <p className="form-error">{errors.email.message}</p>}</div>
             </div>
-            <div><Label>Topic</Label><Controller name="topic" control={control} render={({ field }) => (<Select onValueChange={field.onChange} value={field.value}><SelectTrigger className="mt-token-1"><SelectValue placeholder="Select a topic" /></SelectTrigger><SelectContent><SelectItem value="verification">Verification Issue</SelectItem><SelectItem value="account">Account Problem</SelectItem><SelectItem value="report">Report a User</SelectItem><SelectItem value="billing">Billing / Payments</SelectItem><SelectItem value="bug">Bug Report</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select>)} />{errors.topic && <p className="text-token-sm text-destructive mt-token-1">{errors.topic.message}</p>}</div>
-            <div><Label htmlFor="message">Message</Label><Textarea id="message" placeholder="Describe your issue or question..." rows={5} {...register("message")} className="mt-token-1" />{errors.message && <p className="text-token-sm text-destructive mt-token-1">{errors.message.message}</p>}</div>
+            <div><Label>Topic</Label><Controller name="topic" control={control} render={({ field }) => (<Select onValueChange={field.onChange} value={field.value}><SelectTrigger className="mt-token-1"><SelectValue placeholder="Select a topic" /></SelectTrigger><SelectContent><SelectItem value="verification">Verification Issue</SelectItem><SelectItem value="account">Account Problem</SelectItem><SelectItem value="report">Report a User</SelectItem><SelectItem value="billing">Billing / Payments</SelectItem><SelectItem value="bug">Bug Report</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select>)} />{errors.topic && <p className="form-error">{errors.topic.message}</p>}</div>
+            <div><Label htmlFor="message">Message</Label><Textarea id="message" placeholder="Describe your issue or question..." rows={5} {...register("message")} className="mt-token-1" />{errors.message && <p className="form-error">{errors.message.message}</p>}</div>
             <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}><FiSend className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} />Send Message</Button>
           </form>
         )}
