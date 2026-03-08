@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 import PublicLayout from "./components/layout/PublicLayout";
 import AuthLayout from "./components/layout/AuthLayout";
@@ -45,52 +47,52 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Public pages with Navbar + Footer */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/profile/:id" element={<ProfileDetail />} />
-          </Route>
+        <AuthProvider>
+          <Routes>
+            {/* Public pages with Navbar + Footer */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/profile/:id" element={<ProfileDetail />} />
+            </Route>
 
-          {/* Auth pages with minimal layout */}
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/verification" element={<Verification />} />
-            <Route path="/verification-status" element={<VerificationStatus />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/help" element={<HelpCenter />} />
-          </Route>
+            {/* Auth pages with minimal layout */}
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/help" element={<HelpCenter />} />
+            </Route>
 
-          {/* Dashboard with sidebar layout */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="profile" element={<ProfileView />} />
-            <Route path="create-profile" element={<CreateProfile />} />
-            <Route path="edit-profile" element={<CreateProfile />} />
-            <Route path="photos" element={<Photos />} />
-            <Route path="preferences" element={<Settings />} />
-            <Route path="search" element={<Search />} />
-            <Route path="nearby" element={<Search />} />
-            <Route path="interests" element={<Interests />} />
-            <Route path="favorites" element={<Favorites />} />
-            <Route path="messages" element={<Messages />} />
-            <Route path="who-viewed-me" element={<WhoViewedMe />} />
-            <Route path="verification" element={<Verification />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="blocked-users" element={<BlockedUsers />} />
-          </Route>
+            {/* Dashboard with sidebar layout — PROTECTED */}
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route index element={<DashboardHome />} />
+              <Route path="profile" element={<ProfileView />} />
+              <Route path="create-profile" element={<CreateProfile />} />
+              <Route path="edit-profile" element={<CreateProfile />} />
+              <Route path="photos" element={<Photos />} />
+              <Route path="preferences" element={<Settings />} />
+              <Route path="search" element={<Search />} />
+              <Route path="nearby" element={<Search />} />
+              <Route path="interests" element={<Interests />} />
+              <Route path="favorites" element={<Favorites />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="who-viewed-me" element={<WhoViewedMe />} />
+              <Route path="verification" element={<Verification />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="blocked-users" element={<BlockedUsers />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

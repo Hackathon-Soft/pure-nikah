@@ -3,58 +3,163 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FiSend, FiShield } from "react-icons/fi";
-import { useState } from "react";
-
-const conversations = [
-  { id: 1, name: "Fatima A.", lastMsg: "JazakAllah, I'll let my family know.", time: "2 min ago", unread: 2, verified: true },
-  { id: 2, name: "Aisha R.", lastMsg: "Yes, that works. InShaAllah.", time: "1 hour ago", unread: 0, verified: true },
-  { id: 3, name: "Sara K.", lastMsg: "Assalamu Alaikum", time: "Yesterday", unread: 1, verified: false },
-];
-const messages = [
-  { id: 1, from: "them", text: "Assalamu Alaikum! I read your profile and it looks great MashaAllah.", time: "10:00 AM" },
-  { id: 2, from: "me", text: "Wa Alaikum Assalam! JazakAllah. I found your profile interesting as well.", time: "10:05 AM" },
-  { id: 3, from: "them", text: "Alhamdulillah. My family is also involved in this process. Would you like to share more about yourself?", time: "10:08 AM" },
-  { id: 4, from: "me", text: "Of course, I believe in keeping things halal. My wali is also aware.", time: "10:12 AM" },
-  { id: 5, from: "them", text: "JazakAllah, I'll let my family know.", time: "10:15 AM" },
-];
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Messages = () => {
-  const [selected, setSelected] = useState(conversations[0]);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [selectedId, setSelectedId] = useState(null);
   const [newMsg, setNewMsg] = useState("");
+  const messagesEndRef = useRef(null);
+
+  // Fetch conversations with other user's profile
+  const { data: conversations = [] } = useQuery({
+    queryKey: ["conversations", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("conversations")
+        .select("*")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+        .order("last_message_at", { ascending: false });
+
+      if (!data) return [];
+
+      // Fetch profiles for each conversation partner
+      const enriched = await Promise.all(data.map(async (c) => {
+        const otherId = c.user1_id === user.id ? c.user2_id : c.user1_id;
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("first_name, last_name, is_verified")
+          .eq("user_id", otherId)
+          .single();
+        return { ...c, otherProfile: profile, otherUserId: otherId };
+      }));
+      return enriched;
+    },
+    enabled: !!user,
+  });
+
+  const selected = conversations.find(c => c.id === selectedId) || conversations[0];
+
+  // Fetch messages for selected conversation
+  const { data: messages = [] } = useQuery({
+    queryKey: ["messages", selected?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", selected.id)
+        .order("created_at", { ascending: true });
+      return data || [];
+    },
+    enabled: !!selected?.id,
+  });
+
+  // Realtime subscription for new messages
+  useEffect(() => {
+    if (!selected?.id) return;
+    const channel = supabase
+      .channel(`messages-${selected.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${selected.id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["messages", selected.id] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [selected?.id, queryClient]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMutation = useMutation({
+    mutationFn: async (content) => {
+      const { error } = await supabase.from("messages").insert({
+        conversation_id: selected.id,
+        sender_id: user.id,
+        content,
+      });
+      if (error) throw error;
+      // Update conversation last message
+      await supabase.from("conversations").update({
+        last_message: content,
+        last_message_at: new Date().toISOString(),
+      }).eq("id", selected.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages", selected?.id] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      setNewMsg("");
+    },
+  });
+
+  const handleSend = () => {
+    if (!newMsg.trim() || !selected) return;
+    sendMutation.mutate(newMsg.trim());
+  };
+
+  if (conversations.length === 0) {
+    return (
+      <div className="flex h-[calc(100vh-var(--size-navbar))] items-center justify-center">
+        <div className="text-center space-y-3">
+          <p className="text-token-lg font-display font-semibold text-foreground">No Conversations Yet</p>
+          <p className="text-token-sm text-muted-foreground">When you have a mutual interest, you can start messaging.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-[calc(100vh-var(--size-navbar))]">
       <div className="w-80 border-r border-border bg-card flex-shrink-0 hidden md:flex flex-col">
         <div className="p-token-4 border-b border-border"><h2 className="font-display text-token-lg font-semibold text-foreground">Messages</h2></div>
         <div className="flex-1 overflow-y-auto">
           {conversations.map((c) => (
-            <button key={c.id} onClick={() => setSelected(c)} className={`w-full text-left p-token-4 border-b border-border hover:bg-muted transition-colors flex gap-token-3 ${selected.id === c.id ? "bg-primary/5" : ""}`}>
-              <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{c.name.charAt(0)}</div>
+            <button key={c.id} onClick={() => setSelectedId(c.id)} className={`w-full text-left p-token-4 border-b border-border hover:bg-muted transition-colors flex gap-token-3 ${selected?.id === c.id ? "bg-primary/5" : ""}`}>
+              <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{c.otherProfile?.first_name?.charAt(0) || "?"}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{c.name}{c.verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p><span className="text-token-xs text-muted-foreground flex-shrink-0">{c.time}</span></div>
-                <p className="text-token-xs text-muted-foreground truncate">{c.lastMsg}</p>
+                <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{c.otherProfile?.first_name || "User"}{c.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+                <p className="text-token-xs text-muted-foreground truncate">{c.last_message || "No messages yet"}</p>
               </div>
-              {c.unread > 0 && <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-token-xs flex items-center justify-center flex-shrink-0">{c.unread}</span>}
             </button>
           ))}
         </div>
       </div>
+
       <div className="flex-1 flex flex-col">
         <div className="p-token-4 border-b border-border bg-card flex items-center gap-token-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{selected.name.charAt(0)}</div>
-          <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{selected.name}{selected.verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p><p className="text-token-xs text-muted-foreground">Online</p></div>
+          <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{selected?.otherProfile?.first_name?.charAt(0) || "?"}</div>
+          <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{selected?.otherProfile?.first_name || "User"}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
         </div>
         <div className="flex-1 overflow-y-auto p-token-4 space-y-3">
           {messages.map((msg) => (
-            <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.from === "me" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[70%] rounded-2xl px-token-4 py-token-3 ${msg.from === "me" ? "bg-gradient-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
-                <p className="text-token-sm">{msg.text}</p>
-                <p className={`text-token-xs mt-token-1 ${msg.from === "me" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{msg.time}</p>
+            <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.sender_id === user.id ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[70%] rounded-2xl px-token-4 py-token-3 ${msg.sender_id === user.id ? "bg-gradient-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                <p className="text-token-sm">{msg.content}</p>
+                <p className={`text-token-xs mt-token-1 ${msg.sender_id === user.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
               </div>
             </motion.div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         <div className="p-token-4 border-t border-border bg-card">
-          <div className="flex gap-token-3"><Input value={newMsg} onChange={(e) => setNewMsg(e.target.value)} placeholder="Type a message..." className="flex-1" /><Button variant="hero" size="icon"><FiSend style={{ fontSize: "var(--size-icon)" }} /></Button></div>
+          <div className="flex gap-token-3">
+            <Input
+              value={newMsg}
+              onChange={(e) => setNewMsg(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1"
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            />
+            <Button variant="hero" size="icon" onClick={handleSend} disabled={sendMutation.isPending}>
+              <FiSend style={{ fontSize: "var(--size-icon)" }} />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

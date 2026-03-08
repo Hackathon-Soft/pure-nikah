@@ -7,7 +7,9 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const schema = yup.object({
   password: yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
@@ -17,8 +19,28 @@ const schema = yup.object({
 const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [done, setDone] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(false);
+  const { toast } = useToast();
+  const { updatePassword } = useAuth();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ resolver: yupResolver(schema) });
-  const onSubmit = () => { setDone(true); };
+
+  useEffect(() => {
+    // Check for recovery token in URL hash
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery")) {
+      setIsRecovery(true);
+    }
+  }, []);
+
+  const onSubmit = async (data) => {
+    const { error } = await updatePassword(data.password);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      setDone(true);
+      toast({ title: "Success", description: "Your password has been updated." });
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="auth-card">
@@ -33,7 +55,9 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div><Label htmlFor="password">New Password</Label><div className="relative mt-token-1"><Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters" {...register("password")} /><button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">{showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}</button></div>{errors.password && <p className="form-error">{errors.password.message}</p>}</div>
           <div><Label htmlFor="confirmPassword">Confirm Password</Label><Input id="confirmPassword" type="password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />{errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}</div>
-          <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>Update Password</Button>
+          <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Updating..." : "Update Password"}
+          </Button>
         </form>
       )}
     </motion.div>
