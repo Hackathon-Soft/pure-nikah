@@ -6,22 +6,24 @@ import { FaHeart } from "react-icons/fa";
 import { FiArrowLeft, FiMail } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
-const schema = z.object({
-  email: z.string().email("Please enter a valid email").max(255),
+const schema = yup.object({
+  email: yup.string().email("Please enter a valid email").max(255).required("Email is required"),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = {
+  email: string;
+};
 
 const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   const onSubmit = (_data: FormData) => {

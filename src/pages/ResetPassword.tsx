@@ -6,26 +6,28 @@ import { FaHeart } from "react-icons/fa";
 import { FiEye, FiEyeOff, FiCheckCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 
-const schema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-}).refine(d => d.password === d.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+const schema = yup.object({
+  password: yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+  confirmPassword: yup.string()
+    .oneOf([yup.ref("password")], "Passwords don't match")
+    .required("Please confirm your password"),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = {
+  password: string;
+  confirmPassword: string;
+};
 
 const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [done, setDone] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   const onSubmit = (_data: FormData) => {

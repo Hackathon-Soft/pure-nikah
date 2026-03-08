@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import {
@@ -18,20 +18,29 @@ import {
 } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi";
 
-const verificationSchema = z.object({
-  cnicNumber: z
+const verificationSchema = yup.object({
+  cnicNumber: yup
     .string()
-    .regex(/^\d{5}-\d{7}-\d{1}$/, "CNIC must be in format: 12345-1234567-1"),
-  fullName: z.string().min(3, "Full name as per CNIC").max(100),
-  fatherName: z.string().min(3, "Father name as per CNIC").max(100),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  address: z.string().min(10, "Provide full address as per CNIC").max(300),
-  phoneNumber: z
+    .matches(/^\d{5}-\d{7}-\d{1}$/, "CNIC must be in format: 12345-1234567-1")
+    .required("CNIC number is required"),
+  fullName: yup.string().min(3, "Full name as per CNIC").max(100).required("Full name is required"),
+  fatherName: yup.string().min(3, "Father name as per CNIC").max(100).required("Father name is required"),
+  dateOfBirth: yup.string().min(1, "Date of birth is required").required("Date of birth is required"),
+  address: yup.string().min(10, "Provide full address as per CNIC").max(300).required("Address is required"),
+  phoneNumber: yup
     .string()
-    .regex(/^(\+92|0)\d{10}$/, "Enter valid Pakistani phone number"),
+    .matches(/^(\+92|0)\d{10}$/, "Enter valid Pakistani phone number")
+    .required("Phone number is required"),
 });
 
-type VerificationForm = z.infer<typeof verificationSchema>;
+type VerificationForm = {
+  cnicNumber: string;
+  fullName: string;
+  fatherName: string;
+  dateOfBirth: string;
+  address: string;
+  phoneNumber: string;
+};
 
 type VerificationStatus = "not_submitted" | "pending" | "verified" | "rejected" | "expired";
 
@@ -79,7 +88,7 @@ const Verification = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<VerificationForm>({ resolver: zodResolver(verificationSchema) });
+  } = useForm<VerificationForm>({ resolver: yupResolver(verificationSchema) as any });
 
   const onSubmit = (_data: VerificationForm) => {
     if (!cnicFront || !cnicBack) {
