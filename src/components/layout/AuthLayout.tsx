@@ -31,9 +31,9 @@ const AuthLayout = () => (
       <div className="max-w-screen-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-token-2 text-token-xs text-muted-foreground">
         <span>© {new Date().getFullYear()} PureNikah. All rights reserved.</span>
         <div className="flex items-center gap-token-4">
-          <span className="hover:text-primary transition-colors cursor-pointer">Privacy Policy</span>
-          <span className="hover:text-primary transition-colors cursor-pointer">Terms of Service</span>
-          <span className="hover:text-primary transition-colors cursor-pointer">Help</span>
+          <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+          <Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
+          <Link to="/help" className="hover:text-primary transition-colors">Help</Link>
         </div>
       </div>
     </footer>
