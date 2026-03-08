@@ -70,8 +70,8 @@
 - [ ] **Verification Approved** (success screen)
 - [ ] **Verification Rejected** (rejection + re-submit screen)
 - [ ] **6-Month Re-verification** (renewal prompt screen)
-- [ ] **Create/Edit Profile** (full form: basic info, religious info, lifestyle, family, preferences, photos)
-- [ ] **Upload Photos** (gallery, blur-until-accepted, private gallery)
+- [x] **Create/Edit Profile** (full 6-step form: basic info, religious info, lifestyle, family background, marriage preferences, photo upload with privacy settings)
+- [x] **Upload Photos** (profile photo + gallery up to 5, blur-until-accepted, private, public privacy modes)
 - [ ] **Nearby Matches** (dedicated location-based page)
 - [ ] **Match Requests** (who liked your profile)
 
