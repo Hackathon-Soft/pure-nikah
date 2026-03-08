@@ -22,13 +22,10 @@ const VerificationStatus = () => {
         <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
           Verification Status
         </h1>
-            <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
-              Verification Status
-            </h1>
-            <p className="text-muted-foreground mb-token-8">
-              Track the progress of your identity verification.
-            </p>
-          </motion.div>
+        <p className="text-muted-foreground mb-token-8">
+          Track the progress of your identity verification.
+        </p>
+      </motion.div>
 
           {/* Current Status */}
           <motion.div
