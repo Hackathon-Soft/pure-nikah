@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Search as SearchIcon, MapPin, BookOpen, Heart } from "lucide-react";
+import { FiSearch, FiMapPin, FiBookOpen, FiHeart } from "react-icons/fi";
 import { useState } from "react";
 
 const mockProfiles = [
@@ -24,11 +24,11 @@ const SearchPage = () => {
   return (
     <>
       <Navbar />
-      <main className="pt-16 min-h-screen bg-muted islamic-pattern">
-        <div className="container mx-auto px-4 py-10">
+      <main className="pt-navbar min-h-screen bg-muted islamic-pattern">
+        <div className="container mx-auto px-token-4 py-token-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-3xl font-display font-bold text-foreground mb-2">Search Profiles</h1>
-            <p className="text-muted-foreground mb-8">Find your compatible match using our advanced filters.</p>
+            <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">Search Profiles</h1>
+            <p className="text-muted-foreground mb-token-8">Find your compatible match using our advanced filters.</p>
           </motion.div>
 
           {/* Filters */}
@@ -36,20 +36,20 @@ const SearchPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-card rounded-xl border border-border shadow-card p-6 mb-8"
+            className="bg-card rounded-xl border border-border shadow-card p-token-6 mb-token-8"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-token-4">
               <div>
-                <Label className="text-xs">Age Range</Label>
-                <div className="flex gap-2 mt-1">
+                <Label className="text-token-xs">Age Range</Label>
+                <div className="flex gap-token-2 mt-token-1">
                   <Input placeholder="Min" type="number" className="w-full" />
                   <Input placeholder="Max" type="number" className="w-full" />
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Country</Label>
+                <Label className="text-token-xs">Country</Label>
                 <Select>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="uk">United Kingdom</SelectItem>
                     <SelectItem value="us">United States</SelectItem>
@@ -59,9 +59,9 @@ const SearchPage = () => {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs">Education</Label>
+                <Label className="text-token-xs">Education</Label>
                 <Select>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bachelors">Bachelors</SelectItem>
                     <SelectItem value="masters">Masters</SelectItem>
@@ -71,14 +71,14 @@ const SearchPage = () => {
               </div>
               <div className="flex items-end">
                 <Button variant="hero" className="w-full">
-                  <SearchIcon className="h-4 w-4 mr-2" /> Search
+                  <FiSearch className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} /> Search
                 </Button>
               </div>
             </div>
           </motion.div>
 
           {/* Results */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-token-6">
             {results.map((profile, i) => (
               <motion.div
                 key={profile.id}
@@ -88,29 +88,29 @@ const SearchPage = () => {
               >
                 <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
                   <div className="h-32 bg-gradient-primary relative">
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-20 h-20 rounded-full bg-card border-4 border-card flex items-center justify-center">
-                      <span className="text-2xl font-display font-bold text-primary">
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[var(--size-avatar)] h-[var(--size-avatar)] rounded-full bg-card border-4 border-card flex items-center justify-center">
+                      <span className="text-token-2xl font-display font-bold text-primary">
                         {profile.name.charAt(0)}
                       </span>
                     </div>
                   </div>
-                  <CardContent className="pt-14 pb-6 text-center">
-                    <h3 className="font-display text-lg font-semibold text-foreground">{profile.name}</h3>
-                    <p className="text-sm text-muted-foreground">{profile.age} years old</p>
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-1">
-                      <MapPin className="h-3 w-3" /> {profile.location}
+                  <CardContent className="pt-token-14 pb-token-6 text-center">
+                    <h3 className="font-display text-token-lg font-semibold text-foreground">{profile.name}</h3>
+                    <p className="text-token-sm text-muted-foreground">{profile.age} years old</p>
+                    <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
+                      <FiMapPin style={{ fontSize: "var(--text-xs)" }} /> {profile.location}
                     </div>
-                    <div className="flex justify-center gap-2 mt-3">
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1">
-                        <BookOpen className="h-3 w-3" /> {profile.religiosity}
+                    <div className="flex justify-center gap-token-2 mt-token-3">
+                      <span className="text-token-xs bg-primary/10 text-primary px-token-2 py-token-1 rounded-full flex items-center gap-token-1">
+                        <FiBookOpen style={{ fontSize: "var(--text-xs)" }} /> {profile.religiosity}
                       </span>
-                      <span className="text-xs bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
+                      <span className="text-token-xs bg-accent/20 text-accent-foreground px-token-2 py-token-1 rounded-full">
                         {profile.education}
                       </span>
                     </div>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex gap-token-2 mt-token-4">
                       <Button variant="hero" size="sm" className="flex-1">
-                        <Heart className="h-3 w-3 mr-1" /> Interest
+                        <FiHeart className="mr-token-1" style={{ fontSize: "var(--text-xs)" }} /> Interest
                       </Button>
                       <Button variant="outline" size="sm" className="flex-1">
                         View Profile
