@@ -14,7 +14,343 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message: string | null
+          last_message_at: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          to_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read: boolean | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          related_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_views: {
+        Row: {
+          created_at: string
+          id: string
+          viewed_id: string
+          viewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          viewed_id: string
+          viewer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          viewed_id?: string
+          viewer_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          accept_divorced: boolean | null
+          accept_with_children: boolean | null
+          bio: string | null
+          caste: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          dietary: string | null
+          education: string | null
+          family_type: string | null
+          family_values: string | null
+          father_occupation: string | null
+          first_name: string
+          gender: string | null
+          height: string | null
+          hijab_beard: string | null
+          id: string
+          income_range: string | null
+          is_verified: boolean | null
+          islamic_values: string | null
+          languages: string[] | null
+          last_name: string
+          living_with: string | null
+          marital_status: string | null
+          mother_occupation: string | null
+          photo_privacy: string | null
+          prayer_level: string | null
+          preferred_age_max: number | null
+          preferred_age_min: number | null
+          preferred_caste: string | null
+          preferred_education: string | null
+          preferred_location: string | null
+          profession: string | null
+          profile_completed: boolean | null
+          quran_recitation: string | null
+          religious_expectations: string | null
+          religious_practice: string | null
+          sect: string | null
+          siblings: string | null
+          smoking: string | null
+          updated_at: string
+          user_id: string
+          willing_to_relocate: boolean | null
+        }
+        Insert: {
+          accept_divorced?: boolean | null
+          accept_with_children?: boolean | null
+          bio?: string | null
+          caste?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary?: string | null
+          education?: string | null
+          family_type?: string | null
+          family_values?: string | null
+          father_occupation?: string | null
+          first_name?: string
+          gender?: string | null
+          height?: string | null
+          hijab_beard?: string | null
+          id?: string
+          income_range?: string | null
+          is_verified?: boolean | null
+          islamic_values?: string | null
+          languages?: string[] | null
+          last_name?: string
+          living_with?: string | null
+          marital_status?: string | null
+          mother_occupation?: string | null
+          photo_privacy?: string | null
+          prayer_level?: string | null
+          preferred_age_max?: number | null
+          preferred_age_min?: number | null
+          preferred_caste?: string | null
+          preferred_education?: string | null
+          preferred_location?: string | null
+          profession?: string | null
+          profile_completed?: boolean | null
+          quran_recitation?: string | null
+          religious_expectations?: string | null
+          religious_practice?: string | null
+          sect?: string | null
+          siblings?: string | null
+          smoking?: string | null
+          updated_at?: string
+          user_id: string
+          willing_to_relocate?: boolean | null
+        }
+        Update: {
+          accept_divorced?: boolean | null
+          accept_with_children?: boolean | null
+          bio?: string | null
+          caste?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary?: string | null
+          education?: string | null
+          family_type?: string | null
+          family_values?: string | null
+          father_occupation?: string | null
+          first_name?: string
+          gender?: string | null
+          height?: string | null
+          hijab_beard?: string | null
+          id?: string
+          income_range?: string | null
+          is_verified?: boolean | null
+          islamic_values?: string | null
+          languages?: string[] | null
+          last_name?: string
+          living_with?: string | null
+          marital_status?: string | null
+          mother_occupation?: string | null
+          photo_privacy?: string | null
+          prayer_level?: string | null
+          preferred_age_max?: number | null
+          preferred_age_min?: number | null
+          preferred_caste?: string | null
+          preferred_education?: string | null
+          preferred_location?: string | null
+          profession?: string | null
+          profile_completed?: boolean | null
+          quran_recitation?: string | null
+          religious_expectations?: string | null
+          religious_practice?: string | null
+          sect?: string | null
+          siblings?: string | null
+          smoking?: string | null
+          updated_at?: string
+          user_id?: string
+          willing_to_relocate?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
