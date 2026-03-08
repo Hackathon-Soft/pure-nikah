@@ -8,6 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { FiUser, FiHeart, FiBook, FiBriefcase, FiUsers, FiCamera, FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 import BasicInfoStep from "@/components/profile/BasicInfoStep";
 import ReligiousInfoStep from "@/components/profile/ReligiousInfoStep";
@@ -88,17 +91,52 @@ const steps = [
 const CreateProfile = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, profile, fetchProfile } = useAuth();
+  const navigate = useNavigate();
 
   const methods = useForm({
     resolver: yupResolver(fullProfileSchema),
     defaultValues: {
-      firstName: "", lastName: "", dateOfBirth: "", gender: undefined, height: "", city: "", country: "", maritalStatus: undefined, bio: "",
-      sect: "", prayerLevel: "", hijabBeard: "", islamicValues: "", religiousPractice: "", quranRecitation: "",
-      education: "", profession: "", incomeRange: "", languages: [], smoking: "", dietary: "",
-      caste: "", familyType: "", familyValues: "", livingWith: "", siblings: "", fatherOccupation: "", motherOccupation: "",
-      preferredAgeMin: 18, preferredAgeMax: 40, preferredLocation: "", preferredCaste: "", preferredEducation: "", religiousExpectations: "",
-      willingToRelocate: false, acceptDivorced: false, acceptWithChildren: false,
-      profilePhoto: "", additionalPhotos: [], photoPrivacy: "blur_until_accepted",
+      firstName: profile?.first_name || "",
+      lastName: profile?.last_name || "",
+      dateOfBirth: profile?.date_of_birth || "",
+      gender: profile?.gender || undefined,
+      height: profile?.height || "",
+      city: profile?.city || "",
+      country: profile?.country || "Pakistan",
+      maritalStatus: profile?.marital_status || undefined,
+      bio: profile?.bio || "",
+      sect: profile?.sect || "",
+      prayerLevel: profile?.prayer_level || "",
+      hijabBeard: profile?.hijab_beard || "",
+      islamicValues: profile?.islamic_values || "",
+      religiousPractice: profile?.religious_practice || "",
+      quranRecitation: profile?.quran_recitation || "",
+      education: profile?.education || "",
+      profession: profile?.profession || "",
+      incomeRange: profile?.income_range || "",
+      languages: profile?.languages || [],
+      smoking: profile?.smoking || "",
+      dietary: profile?.dietary || "",
+      caste: profile?.caste || "",
+      familyType: profile?.family_type || "",
+      familyValues: profile?.family_values || "",
+      livingWith: profile?.living_with || "",
+      siblings: profile?.siblings || "",
+      fatherOccupation: profile?.father_occupation || "",
+      motherOccupation: profile?.mother_occupation || "",
+      preferredAgeMin: profile?.preferred_age_min || 18,
+      preferredAgeMax: profile?.preferred_age_max || 40,
+      preferredLocation: profile?.preferred_location || "",
+      preferredCaste: profile?.preferred_caste || "",
+      preferredEducation: profile?.preferred_education || "",
+      religiousExpectations: profile?.religious_expectations || "",
+      willingToRelocate: profile?.willing_to_relocate || false,
+      acceptDivorced: profile?.accept_divorced || false,
+      acceptWithChildren: profile?.accept_with_children || false,
+      profilePhoto: "",
+      additionalPhotos: [],
+      photoPrivacy: profile?.photo_privacy || "blur_until_accepted",
     },
     mode: "onChange",
   });
@@ -123,9 +161,61 @@ const CreateProfile = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    try { console.log("Profile data:", data); await new Promise((resolve) => setTimeout(resolve, 1500)); toast.success("Profile created successfully!"); }
-    catch (error) { toast.error("Failed to create profile. Please try again."); }
-    finally { setIsSubmitting(false); }
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          date_of_birth: data.dateOfBirth,
+          gender: data.gender,
+          height: data.height,
+          city: data.city,
+          country: data.country,
+          marital_status: data.maritalStatus,
+          bio: data.bio,
+          sect: data.sect,
+          prayer_level: data.prayerLevel,
+          hijab_beard: data.hijabBeard,
+          islamic_values: data.islamicValues,
+          religious_practice: data.religiousPractice,
+          quran_recitation: data.quranRecitation,
+          education: data.education,
+          profession: data.profession,
+          income_range: data.incomeRange,
+          languages: data.languages,
+          smoking: data.smoking,
+          dietary: data.dietary,
+          caste: data.caste,
+          family_type: data.familyType,
+          family_values: data.familyValues,
+          living_with: data.livingWith,
+          siblings: data.siblings,
+          father_occupation: data.fatherOccupation,
+          mother_occupation: data.motherOccupation,
+          preferred_age_min: data.preferredAgeMin,
+          preferred_age_max: data.preferredAgeMax,
+          preferred_location: data.preferredLocation,
+          preferred_caste: data.preferredCaste,
+          preferred_education: data.preferredEducation,
+          religious_expectations: data.religiousExpectations,
+          willing_to_relocate: data.willingToRelocate,
+          accept_divorced: data.acceptDivorced,
+          accept_with_children: data.acceptWithChildren,
+          photo_privacy: data.photoPrivacy,
+          profile_completed: true,
+        })
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+      await fetchProfile(user.id);
+      toast.success("Profile saved successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("Failed to save profile: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStep = () => {
@@ -143,7 +233,9 @@ const CreateProfile = () => {
   return (
     <div className="p-token-4 md:p-token-8 max-w-4xl mx-auto space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-token-2xl md:text-token-3xl font-display font-bold text-foreground">Create Your Profile</h1>
+        <h1 className="text-token-2xl md:text-token-3xl font-display font-bold text-foreground">
+          {profile?.profile_completed ? "Edit Your Profile" : "Create Your Profile"}
+        </h1>
         <p className="text-muted-foreground mt-1">Complete your profile to find your perfect match</p>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

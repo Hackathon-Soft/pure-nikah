@@ -11,28 +11,10 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useState, useMemo } from "react";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { CompatibilityBadge } from "@/components/CompatibilityBadge";
-
-const mockProfiles = [
-  { id: 1, name: "Ahmed K.", age: 28, location: "Lahore, Pakistan", city: "Lahore", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Rajput", gender: "male", verified: true, distance: "2 km", maritalStatus: "Never Married" },
-  { id: 2, name: "Fatima A.", age: 25, location: "Karachi, Pakistan", city: "Karachi", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Syed", gender: "female", verified: true, distance: "5 km", maritalStatus: "Never Married" },
-  { id: 3, name: "Yusuf M.", age: 31, location: "Islamabad, Pakistan", city: "Islamabad", education: "PhD", religiosity: "Practicing", sect: "Sunni", cast: "Mughal", gender: "male", verified: false, distance: "15 km", maritalStatus: "Divorced" },
-  { id: 4, name: "Aisha R.", age: 24, location: "Rawalpindi, Pakistan", city: "Rawalpindi", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Arain", gender: "female", verified: true, distance: "8 km", maritalStatus: "Never Married" },
-  { id: 5, name: "Omar H.", age: 30, location: "Faisalabad, Pakistan", city: "Faisalabad", education: "Bachelors", religiosity: "Very Practicing", sect: "Sunni", cast: "Jat", gender: "male", verified: true, distance: "25 km", maritalStatus: "Widowed" },
-  { id: 6, name: "Maryam S.", age: 27, location: "Multan, Pakistan", city: "Multan", education: "Masters", religiosity: "Practicing", sect: "Sunni", cast: "Sheikh", gender: "female", verified: false, distance: "50 km", maritalStatus: "Never Married" },
-];
-
-// Simulated current user preferences
-const myPreferences = {
-  ageMin: 22,
-  ageMax: 30,
-  city: "Lahore",
-  sect: "Sunni",
-  cast: "Any",
-  education: "Bachelors",
-  religiosity: "Practicing",
-  maritalStatus: "Any",
-  preferVerified: true,
-};
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 const cities = ["Any", "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta"];
 const castes = ["Any", "Syed", "Rajput", "Mughal", "Arain", "Jat", "Sheikh", "Pathan", "Baloch", "Malik", "Other"];
@@ -41,33 +23,96 @@ const sects = ["Any", "Sunni", "Shia", "Deobandi", "Barelvi", "Ahl-e-Hadith"];
 const maritalOptions = ["Any", "Never Married", "Divorced", "Widowed"];
 
 const SearchPage = () => {
-  const [results] = useState(mockProfiles);
+  const { user, profile, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showFilters, setShowFilters] = useState(false);
   const [ageRange, setAgeRange] = useState([18, 45]);
   const [searchType, setSearchType] = useState("all");
+  const [cityFilter, setCityFilter] = useState("any");
+  const [searchText, setSearchText] = useState("");
 
-  const filtered = results.filter((p) => {
+  // Fetch profiles from database
+  const { data: dbProfiles = [], isLoading } = useQuery({
+    queryKey: ["search-profiles"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("profile_completed", true);
+      return data || [];
+    },
+  });
+
+  // Filter out current user's profile
+  const profiles = dbProfiles.filter(p => p.user_id !== user?.id);
+
+  const myPreferences = profile ? {
+    ageMin: profile.preferred_age_min || 18,
+    ageMax: profile.preferred_age_max || 45,
+    city: profile.city || "",
+    sect: profile.sect || "",
+    cast: profile.caste || "Any",
+    education: profile.education || "",
+    religiosity: profile.religious_practice || "",
+    maritalStatus: profile.marital_status || "Any",
+    preferVerified: true,
+  } : {
+    ageMin: 18, ageMax: 45, city: "", sect: "Sunni", cast: "Any",
+    education: "Bachelors", religiosity: "Practicing", maritalStatus: "Any", preferVerified: true,
+  };
+
+  const filtered = profiles.filter((p) => {
     if (searchType === "male" && p.gender !== "male") return false;
     if (searchType === "female" && p.gender !== "female") return false;
-    if (searchType === "widowed" && p.maritalStatus !== "Widowed") return false;
-    if (searchType === "divorced" && p.maritalStatus !== "Divorced") return false;
-    if (p.age < ageRange[0] || p.age > ageRange[1]) return false;
+    if (searchType === "widowed" && p.marital_status !== "widowed") return false;
+    if (searchType === "divorced" && p.marital_status !== "divorced") return false;
+    if (cityFilter !== "any" && p.city?.toLowerCase() !== cityFilter) return false;
+    if (searchText && !p.first_name?.toLowerCase().includes(searchText.toLowerCase()) && !p.city?.toLowerCase().includes(searchText.toLowerCase())) return false;
     return true;
   });
 
-  // Calculate compatibility for each profile and sort by score
   const withScores = useMemo(() => {
     return filtered
-      .map((p) => ({ ...p, compatibility: calculateCompatibility(myPreferences, p) }))
+      .map((p) => ({
+        ...p,
+        compatibility: calculateCompatibility(myPreferences, {
+          sect: p.sect, cast: p.caste, city: p.city, education: p.education,
+          age: p.date_of_birth ? Math.floor((Date.now() - new Date(p.date_of_birth).getTime()) / 31557600000) : 25,
+          maritalStatus: p.marital_status, religiosity: p.religious_practice,
+        }),
+      }))
       .sort((a, b) => b.compatibility - a.compatibility);
-  }, [filtered]);
+  }, [filtered, myPreferences]);
+
+  const sendInterestMutation = useMutation({
+    mutationFn: async (toUserId) => {
+      const { error } = await supabase.from("interests").insert({
+        from_user_id: user.id,
+        to_user_id: toUserId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Interest sent!", description: "The user will be notified." });
+      queryClient.invalidateQueries({ queryKey: ["interests-sent"] });
+    },
+    onError: (err) => {
+      toast({ title: "Failed", description: err.message?.includes("duplicate") ? "You already sent an interest to this user." : err.message, variant: "destructive" });
+    },
+  });
+
+  const getAge = (dob) => {
+    if (!dob) return "N/A";
+    return Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000);
+  };
 
   return (
     <div className="min-h-screen bg-muted islamic-pattern">
       <div className="app-container py-token-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="page-title mb-token-2">Search Proposals</h1>
-          <p className="text-muted-foreground mb-token-6">Find nearby proposals by location, cast, preferences, or custom filters.</p>
+          <p className="text-muted-foreground mb-token-6">Find proposals by location, cast, preferences, or custom filters.</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="flex gap-token-3 mb-token-6 flex-wrap">
@@ -78,11 +123,7 @@ const SearchPage = () => {
             { label: "🕊️ Widowed", value: "widowed" },
             { label: "💫 Divorced", value: "divorced" },
           ].map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setSearchType(tab.value)}
-              className={searchType === tab.value ? "pill-active" : "pill-inactive"}
-            >
+            <button key={tab.value} onClick={() => setSearchType(tab.value)} className={searchType === tab.value ? "pill-active" : "pill-inactive"}>
               {tab.label}
             </button>
           ))}
@@ -92,7 +133,6 @@ const SearchPage = () => {
           </button>
         </motion.div>
 
-        {/* Special banner for widowed/divorced */}
         {(searchType === "widowed" || searchType === "divorced") && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-token-6">
             <Card className="border-primary/30 bg-primary/5">
@@ -110,9 +150,7 @@ const SearchPage = () => {
                       : "Everyone deserves a second chance. Get 50% off premium, priority search placement, and free verification."}
                   </p>
                 </div>
-                <Button variant="hero" size="sm" asChild>
-                  <Link to="/pricing">View Discounts</Link>
-                </Button>
+                <Button variant="hero" size="sm" asChild><Link to="/pricing">View Discounts</Link></Button>
               </CardContent>
             </Card>
           </motion.div>
@@ -122,88 +160,86 @@ const SearchPage = () => {
           <div className="flex flex-col sm:flex-row gap-token-3">
             <div className="flex-1 relative">
               <HiOutlineLocationMarker className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: "var(--size-icon)" }} />
-              <Input placeholder="Search by city, area, or nearby..." className="pl-10" />
-            </div>
-            <div className="flex-1 relative">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: "var(--size-icon)" }} />
-              <Input placeholder="Search by name or keyword..." className="pl-10" />
+              <Input placeholder="Search by city..." className="pl-10" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
             </div>
             <Button variant="hero"><FiSearch className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} /> Search</Button>
           </div>
         </motion.div>
 
         {showFilters && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="card-base p-token-6 mb-token-8">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="card-base p-token-6 mb-token-8">
             <h3 className="card-section-title mb-token-4">Advanced Filters</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-token-4">
               <div className="sm:col-span-2">
                 <Label className="text-token-xs">Age Range: {ageRange[0]} - {ageRange[1]}</Label>
                 <Slider min={18} max={60} step={1} value={ageRange} onValueChange={setAgeRange} className="mt-token-3" />
               </div>
-              <div><Label className="text-token-xs">City</Label><Select><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{cities.map((c) => <SelectItem key={c} value={c.toLowerCase()}>{c}</SelectItem>)}</SelectContent></Select></div>
-              <div><Label className="text-token-xs">Cast / Biradari</Label><Select><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{castes.map((c) => <SelectItem key={c} value={c.toLowerCase()}>{c}</SelectItem>)}</SelectContent></Select></div>
-              <div><Label className="text-token-xs">Education</Label><Select><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{educationOptions.map((e) => <SelectItem key={e} value={e.toLowerCase()}>{e}</SelectItem>)}</SelectContent></Select></div>
+              <div><Label className="text-token-xs">City</Label><Select value={cityFilter} onValueChange={setCityFilter}><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{cities.map((c) => <SelectItem key={c} value={c.toLowerCase()}>{c}</SelectItem>)}</SelectContent></Select></div>
               <div><Label className="text-token-xs">Sect / Maslak</Label><Select><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{sects.map((s) => <SelectItem key={s} value={s.toLowerCase()}>{s}</SelectItem>)}</SelectContent></Select></div>
-              <div><Label className="text-token-xs">Marital Status</Label><Select><SelectTrigger className="mt-token-1"><SelectValue placeholder="Any" /></SelectTrigger><SelectContent>{maritalOptions.map((m) => <SelectItem key={m} value={m.toLowerCase()}>{m}</SelectItem>)}</SelectContent></Select></div>
-              <div><Label className="text-token-xs">Min Height (ft)</Label><Input type="number" placeholder="e.g. 5.4" className="mt-token-1" /></div>
-            </div>
-            <div className="flex gap-token-3 mt-token-6">
-              <Button variant="hero"><FiSearch className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} /> Apply Filters</Button>
-              <Button variant="outline">Clear All</Button>
             </div>
           </motion.div>
         )}
 
-        <p className="text-token-sm text-muted-foreground mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>
+        {isLoading ? (
+          <div className="text-center py-token-12"><p className="text-muted-foreground">Loading profiles...</p></div>
+        ) : (
+          <>
+            <p className="text-token-sm text-muted-foreground mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-token-6">
-          {withScores.map((profile, i) => (
-            <motion.div key={profile.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
-              <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
-                <div className="h-32 bg-gradient-primary relative">
-                  {profile.verified && (
-                    <div className="verified-badge absolute top-3 right-3">
-                      <FiShield style={{ fontSize: "var(--text-xs)" }} /> Verified
-                    </div>
-                  )}
-                  {/* Compatibility badge — top left */}
-                  <div className="absolute top-3 left-3">
-                    <CompatibilityBadge
-                      score={profile.compatibility}
-                      preferences={myPreferences}
-                      candidate={profile}
-                      size="sm"
-                    />
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[var(--size-avatar)] h-[var(--size-avatar)] rounded-full bg-card border-4 border-card flex items-center justify-center">
-                    <span className="text-token-2xl font-display font-bold text-primary">{profile.name.charAt(0)}</span>
-                  </div>
-                </div>
-                <CardContent className="px-token-4 pt-token-14 pb-token-6 text-center">
-                  <h3 className="card-section-title">{profile.name}</h3>
-                  <p className="text-token-sm text-muted-foreground">{profile.age} years old • {profile.cast}</p>
-                  <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
-                    <FiMapPin style={{ fontSize: "var(--text-xs)" }} /> {profile.location}
-                    <span className="ml-token-2 link-primary text-token-xs">{profile.distance} away</span>
-                  </div>
-                  <div className="flex justify-center gap-token-2 mt-token-3 flex-wrap">
-                    <span className="badge-primary flex items-center gap-token-1">
-                      <FiBookOpen style={{ fontSize: "var(--text-xs)" }} /> {profile.religiosity}
-                    </span>
-                    <span className="badge-accent">{profile.education}</span>
-                    <span className="badge-muted">{profile.sect}</span>
-                  </div>
-                  <div className="flex gap-token-2 mt-token-4">
-                    <Button variant="hero" size="sm" className="flex-1"><FiHeart className="mr-token-1" style={{ fontSize: "var(--text-xs)" }} /> Interest</Button>
-                    <Button variant="outline" size="sm" className="flex-1" asChild>
-                      <Link to={`/profile/${profile.id}`}>View Profile</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+            {withScores.length === 0 ? (
+              <div className="text-center py-token-12">
+                <p className="text-token-lg font-display font-semibold text-foreground mb-token-2">No profiles found</p>
+                <p className="text-token-sm text-muted-foreground">Try adjusting your filters or check back later.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-token-6">
+                {withScores.map((p, i) => (
+                  <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
+                    <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
+                      <div className="h-32 bg-gradient-primary relative">
+                        {p.is_verified && (
+                          <div className="verified-badge absolute top-3 right-3">
+                            <FiShield style={{ fontSize: "var(--text-xs)" }} /> Verified
+                          </div>
+                        )}
+                        <div className="absolute top-3 left-3">
+                          <CompatibilityBadge score={p.compatibility} preferences={myPreferences} candidate={p} size="sm" />
+                        </div>
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[var(--size-avatar)] h-[var(--size-avatar)] rounded-full bg-card border-4 border-card flex items-center justify-center">
+                          <span className="text-token-2xl font-display font-bold text-primary">{p.first_name?.charAt(0) || "?"}</span>
+                        </div>
+                      </div>
+                      <CardContent className="px-token-4 pt-token-14 pb-token-6 text-center">
+                        <h3 className="card-section-title">{p.first_name} {p.last_name?.charAt(0) || ""}.</h3>
+                        <p className="text-token-sm text-muted-foreground">{getAge(p.date_of_birth)} years old • {p.caste || "N/A"}</p>
+                        <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
+                          <FiMapPin style={{ fontSize: "var(--text-xs)" }} /> {p.city || "Unknown"}, {p.country || "Pakistan"}
+                        </div>
+                        <div className="flex justify-center gap-token-2 mt-token-3 flex-wrap">
+                          {p.religious_practice && <span className="badge-primary flex items-center gap-token-1"><FiBookOpen style={{ fontSize: "var(--text-xs)" }} /> {p.religious_practice}</span>}
+                          {p.education && <span className="badge-accent">{p.education}</span>}
+                          {p.sect && <span className="badge-muted">{p.sect}</span>}
+                        </div>
+                        <div className="flex gap-token-2 mt-token-4">
+                          {isAuthenticated ? (
+                            <Button variant="hero" size="sm" className="flex-1" onClick={() => sendInterestMutation.mutate(p.user_id)}>
+                              <FiHeart className="mr-token-1" style={{ fontSize: "var(--text-xs)" }} /> Interest
+                            </Button>
+                          ) : (
+                            <Button variant="hero" size="sm" className="flex-1" asChild><Link to="/register">Sign Up</Link></Button>
+                          )}
+                          <Button variant="outline" size="sm" className="flex-1" asChild>
+                            <Link to={`/profile/${p.user_id}`}>View Profile</Link>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
