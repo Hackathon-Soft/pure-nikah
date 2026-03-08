@@ -39,7 +39,7 @@ const Register = () => {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterForm>({ resolver: yupResolver(registerSchema) });
+  } = useForm<RegisterForm>({ resolver: yupResolver(registerSchema) as any });
 
   const onSubmit = (data: RegisterForm) => {
     toast({

@@ -29,7 +29,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: yupResolver(loginSchema) });
+  } = useForm<LoginForm>({ resolver: yupResolver(loginSchema) as any });
 
   const onSubmit = (data: LoginForm) => {
     toast({

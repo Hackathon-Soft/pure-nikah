@@ -27,7 +27,7 @@ const ResetPassword = () => {
   const [done, setDone] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   const onSubmit = (_data: FormData) => {

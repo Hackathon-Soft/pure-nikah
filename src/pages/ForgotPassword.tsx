@@ -23,7 +23,7 @@ const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   const onSubmit = (_data: FormData) => {
