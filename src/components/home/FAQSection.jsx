@@ -12,14 +12,14 @@ const faqs = [
 
 const FAQSection = () => (
   <section className="section-padding">
-    <div className="container mx-auto px-token-4 max-w-3xl">
-      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-token-14">
-        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">FAQ</span>
-        <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">Frequently Asked Questions</h2>
+    <div className="app-container max-w-3xl">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="section-header">
+        <span className="section-label">FAQ</span>
+        <h2 className="section-title">Frequently Asked Questions</h2>
       </motion.div>
       <Accordion type="single" collapsible className="space-y-3">
         {faqs.map((faq, i) => (
-          <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-token-6 shadow-card">
+          <AccordionItem key={i} value={`faq-${i}`} className="card-base px-token-6">
             <AccordionTrigger className="text-left font-display font-semibold text-foreground hover:no-underline">{faq.q}</AccordionTrigger>
             <AccordionContent className="text-muted-foreground leading-token-relaxed">{faq.a}</AccordionContent>
           </AccordionItem>

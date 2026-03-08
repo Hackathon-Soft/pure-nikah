@@ -39,9 +39,9 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-muted islamic-pattern">
-      <div className="container mx-auto px-token-4 py-token-10">
+      <div className="app-container py-token-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">Search Proposals</h1>
+          <h1 className="page-title mb-token-2">Search Proposals</h1>
           <p className="text-muted-foreground mb-token-6">Find nearby proposals by location, cast, preferences, or custom filters.</p>
         </motion.div>
 
@@ -54,22 +54,18 @@ const SearchPage = () => {
             <button
               key={tab.value}
               onClick={() => setSearchType(tab.value)}
-              className={`px-token-5 py-token-2 rounded-full text-token-sm font-medium transition-colors ${
-                searchType === tab.value
-                  ? "bg-gradient-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground"
-              }`}
+              className={searchType === tab.value ? "pill-active" : "pill-inactive"}
             >
               {tab.label}
             </button>
           ))}
-          <button onClick={() => setShowFilters(!showFilters)} className="ml-auto px-token-4 py-token-2 rounded-full text-token-sm font-medium bg-card border border-border text-muted-foreground hover:text-foreground flex items-center gap-token-2 transition-colors">
+          <button onClick={() => setShowFilters(!showFilters)} className="pill-inactive ml-auto flex items-center gap-token-2">
             <FiFilter style={{ fontSize: "var(--size-icon-sm)" }} />
             {showFilters ? "Hide" : "Show"} Filters
           </button>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="bg-card rounded-xl border border-border shadow-card p-token-4 mb-token-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="card-base p-token-4 mb-token-6">
           <div className="flex flex-col sm:flex-row gap-token-3">
             <div className="flex-1 relative">
               <HiOutlineLocationMarker className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: "var(--size-icon)" }} />
@@ -84,8 +80,8 @@ const SearchPage = () => {
         </motion.div>
 
         {showFilters && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border shadow-card p-token-6 mb-token-8">
-            <h3 className="font-display text-token-lg font-semibold text-foreground mb-token-4">Advanced Filters</h3>
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="card-base p-token-6 mb-token-8">
+            <h3 className="card-section-title mb-token-4">Advanced Filters</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-token-4">
               <div className="sm:col-span-2">
                 <Label className="text-token-xs">Age Range: {ageRange[0]} - {ageRange[1]}</Label>
@@ -113,7 +109,7 @@ const SearchPage = () => {
               <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
                 <div className="h-32 bg-gradient-primary relative">
                   {profile.verified && (
-                    <div className="absolute top-3 right-3 bg-card/90 backdrop-blur-sm rounded-full px-token-2 py-token-1 flex items-center gap-token-1 text-token-xs text-primary font-medium">
+                    <div className="verified-badge absolute top-3 right-3">
                       <FiShield style={{ fontSize: "var(--text-xs)" }} /> Verified
                     </div>
                   )}
@@ -122,18 +118,18 @@ const SearchPage = () => {
                   </div>
                 </div>
                 <CardContent className="pt-token-14 pb-token-6 text-center">
-                  <h3 className="font-display text-token-lg font-semibold text-foreground">{profile.name}</h3>
+                  <h3 className="card-section-title">{profile.name}</h3>
                   <p className="text-token-sm text-muted-foreground">{profile.age} years old • {profile.cast}</p>
                   <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
                     <FiMapPin style={{ fontSize: "var(--text-xs)" }} /> {profile.location}
-                    <span className="ml-token-2 text-primary font-medium">{profile.distance} away</span>
+                    <span className="ml-token-2 link-primary text-token-xs">{profile.distance} away</span>
                   </div>
                   <div className="flex justify-center gap-token-2 mt-token-3 flex-wrap">
-                    <span className="text-token-xs bg-primary/10 text-primary px-token-2 py-token-1 rounded-full flex items-center gap-token-1">
+                    <span className="badge-primary flex items-center gap-token-1">
                       <FiBookOpen style={{ fontSize: "var(--text-xs)" }} /> {profile.religiosity}
                     </span>
-                    <span className="text-token-xs bg-accent/20 text-accent-foreground px-token-2 py-token-1 rounded-full">{profile.education}</span>
-                    <span className="text-token-xs bg-muted text-muted-foreground px-token-2 py-token-1 rounded-full">{profile.sect}</span>
+                    <span className="badge-accent">{profile.education}</span>
+                    <span className="badge-muted">{profile.sect}</span>
                   </div>
                   <div className="flex gap-token-2 mt-token-4">
                     <Button variant="hero" size="sm" className="flex-1"><FiHeart className="mr-token-1" style={{ fontSize: "var(--text-xs)" }} /> Interest</Button>

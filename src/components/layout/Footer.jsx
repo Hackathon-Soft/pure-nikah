@@ -3,7 +3,7 @@ import { FaHeart } from "react-icons/fa";
 
 const Footer = () => (
   <footer className="bg-foreground text-background py-section">
-    <div className="container mx-auto px-token-4">
+    <div className="app-container">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-token-10 mb-token-12">
         <div>
           <div className="flex items-center gap-token-2 mb-token-4">
@@ -17,17 +17,17 @@ const Footer = () => (
         <div>
           <h4 className="font-display font-semibold mb-token-4">Platform</h4>
           <div className="flex flex-col gap-token-2 text-token-sm text-background/60">
-            <Link to="/search" className="hover:text-accent transition-colors">Search Profiles</Link>
-            <Link to="/pricing" className="hover:text-accent transition-colors">Pricing</Link>
-            <Link to="/about" className="hover:text-accent transition-colors">About Us</Link>
+            <Link to="/search" className="link-footer">Search Profiles</Link>
+            <Link to="/pricing" className="link-footer">Pricing</Link>
+            <Link to="/about" className="link-footer">About Us</Link>
           </div>
         </div>
         <div>
           <h4 className="font-display font-semibold mb-token-4">Support</h4>
           <div className="flex flex-col gap-token-2 text-token-sm text-background/60">
-            <Link to="/help" className="hover:text-accent transition-colors">Help Center</Link>
-            <Link to="/privacy-policy" className="hover:text-accent transition-colors">Privacy Policy</Link>
-            <Link to="/terms-of-service" className="hover:text-accent transition-colors">Terms of Service</Link>
+            <Link to="/help" className="link-footer">Help Center</Link>
+            <Link to="/privacy-policy" className="link-footer">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="link-footer">Terms of Service</Link>
           </div>
         </div>
         <div>

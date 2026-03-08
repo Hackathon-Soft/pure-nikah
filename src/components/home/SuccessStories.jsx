@@ -10,11 +10,11 @@ const stories = [
 
 const SuccessStories = () => (
   <section className="section-padding bg-card">
-    <div className="container mx-auto px-token-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-token-14">
-        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">Testimonials</span>
-        <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">Success Stories</h2>
-        <p className="text-muted-foreground mt-token-3 max-w-md mx-auto">Real couples who found their match on PureNikah, Alhamdulillah.</p>
+    <div className="app-container">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="section-header">
+        <span className="section-label">Testimonials</span>
+        <h2 className="section-title">Success Stories</h2>
+        <p className="section-subtitle">Real couples who found their match on PureNikah, Alhamdulillah.</p>
       </motion.div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-token-6 max-w-5xl mx-auto">
         {stories.map((story, i) => (

@@ -18,7 +18,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-sticky bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto flex items-center justify-between h-navbar px-token-4">
+      <div className="app-container flex items-center justify-between h-navbar">
         <Link to="/" className="flex items-center gap-token-2">
           <FaHeart className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} />
           <span className="font-display text-token-xl font-bold text-foreground">PureNikah</span>
@@ -29,9 +29,7 @@ const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`text-token-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === link.path ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`nav-link ${location.pathname === link.path ? "nav-link-active" : "nav-link-inactive"}`}
             >
               {link.label}
             </Link>
@@ -70,9 +68,7 @@ const Navbar = () => {
                   key={link.path}
                   to={link.path}
                   onClick={() => setOpen(false)}
-                  className={`text-token-sm font-medium py-token-2 ${
-                    location.pathname === link.path ? "text-primary" : "text-muted-foreground"
-                  }`}
+                  className={`nav-link py-token-2 ${location.pathname === link.path ? "nav-link-active" : "nav-link-inactive"}`}
                 >
                   {link.label}
                 </Link>
