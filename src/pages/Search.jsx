@@ -72,6 +72,8 @@ const SearchPage = () => {
             { label: "All Proposals", value: "all" },
             { label: "Grooms (Male)", value: "male" },
             { label: "Brides (Female)", value: "female" },
+            { label: "🕊️ Widowed", value: "widowed" },
+            { label: "💫 Divorced", value: "divorced" },
           ].map((tab) => (
             <button
               key={tab.value}
@@ -86,6 +88,32 @@ const SearchPage = () => {
             {showFilters ? "Hide" : "Show"} Filters
           </button>
         </motion.div>
+
+        {/* Special banner for widowed/divorced */}
+        {(searchType === "widowed" || searchType === "divorced") && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-token-6">
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-token-4 flex items-center gap-token-4 flex-wrap">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <FiHeart className="text-primary" style={{ fontSize: "var(--size-icon)" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-token-sm font-semibold text-foreground">
+                    {searchType === "widowed" ? "Special Support for Widowed Members" : "Fresh Start for Divorced Members"}
+                  </p>
+                  <p className="text-token-xs text-muted-foreground">
+                    {searchType === "widowed"
+                      ? "We understand your journey. Enjoy free premium features, priority matching, and a free verified badge as our support."
+                      : "Everyone deserves a second chance. Get 50% off premium, priority search placement, and free verification."}
+                  </p>
+                </div>
+                <Button variant="hero" size="sm" asChild>
+                  <Link to="/pricing">View Discounts</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="card-base p-token-4 mb-token-6">
           <div className="flex flex-col sm:flex-row gap-token-3">
