@@ -9,6 +9,8 @@ import {
   FiStar, FiEdit, FiCamera, FiFlag, FiBriefcase, FiClock, FiCheckCircle,
   FiCalendar, FiGlobe, FiHome, FiUsers,
 } from "react-icons/fi";
+import { calculateCompatibility } from "@/lib/compatibility";
+import { CompatibilityBadge } from "@/components/CompatibilityBadge";
 
 const profile = {
   name: "Ahmed Khan",
