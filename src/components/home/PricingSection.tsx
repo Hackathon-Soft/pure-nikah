@@ -1,57 +1,44 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { FiCheck } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
+import { FiCheck, FiHeart } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
+    name: "Free Forever",
+    price: "Free",
+    period: "",
+    description: "Everything you need to find your match — no hidden fees.",
     features: [
-      "Create profile",
-      "Basic search filters",
-      "5 interests per day",
-      "Limited messaging",
-      "View basic profiles",
+      "Create & complete your profile",
+      "Unlimited search & filters",
+      "Send & receive interests",
+      "Unlimited messaging",
+      "View full profiles",
+      "Smart match suggestions",
+      "Location-based search",
+      "Cast & preference filters",
     ],
-    cta: "Get Started",
-    variant: "outline" as const,
-    popular: false,
+    cta: "Get Started Free",
+    variant: "hero" as const,
+    highlight: true,
   },
   {
-    name: "Premium",
-    price: "$19",
-    period: "/month",
+    name: "Sadqa Support",
+    price: "Optional",
+    period: "donation",
+    description: "Help us keep PureNikah running. Any amount is appreciated.",
     features: [
       "Everything in Free",
-      "Unlimited messaging",
-      "Advanced search filters",
-      "See who viewed you",
+      "Support server costs",
+      "Help us stay ad-free",
+      "Earn sadqa-e-jariyah",
       "Priority support",
-      "Compatibility scoring",
-      "Verified badge",
+      "Verified badge faster",
     ],
-    cta: "Go Premium",
-    variant: "hero" as const,
-    popular: true,
-  },
-  {
-    name: "Gold",
-    price: "$39",
-    period: "/month",
-    features: [
-      "Everything in Premium",
-      "AI match recommendations",
-      "Video introduction",
-      "Marriage counselor access",
-      "Profile boost weekly",
-      "Wali management tools",
-    ],
-    cta: "Choose Gold",
+    cta: "Support PureNikah",
     variant: "gold" as const,
-    popular: false,
+    highlight: false,
   },
 ];
 
@@ -64,16 +51,17 @@ const PricingSection = () => (
         viewport={{ once: true }}
         className="text-center mb-token-14"
       >
-        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">Plans</span>
+        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">Pricing</span>
         <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">
-          Simple, Transparent Pricing
+          100% Free. No Hidden Fees.
         </h2>
-        <p className="text-muted-foreground mt-token-3 max-w-md mx-auto">
-          Start for free and upgrade when you're ready for more features.
+        <p className="text-muted-foreground mt-token-3 max-w-lg mx-auto">
+          PureNikah is built as a community service. All features are free. 
+          We only ask for optional donations to keep the platform running.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-token-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-token-6 max-w-3xl mx-auto">
         {plans.map((plan, i) => (
           <motion.div
             key={plan.name}
@@ -82,21 +70,24 @@ const PricingSection = () => (
             viewport={{ once: true }}
             transition={{ delay: i * 0.15 }}
             className={`relative rounded-2xl bg-card border p-token-8 flex flex-col ${
-              plan.popular
-                ? "border-primary shadow-elevated scale-105"
+              plan.highlight
+                ? "border-primary shadow-elevated"
                 : "border-border shadow-card"
             }`}
           >
-            {plan.popular && (
+            {plan.highlight && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary text-primary-foreground text-token-xs font-semibold px-token-4 py-token-1 rounded-full flex items-center gap-token-1">
-                <FaStar style={{ fontSize: "var(--text-xs)" }} /> Most Popular
+                <FiHeart style={{ fontSize: "var(--text-xs)" }} /> Recommended
               </div>
             )}
             <h3 className="font-display text-token-xl font-bold text-foreground">{plan.name}</h3>
-            <div className="mt-token-4 mb-token-6">
+            <div className="mt-token-3 mb-token-2">
               <span className="text-token-4xl font-bold text-foreground">{plan.price}</span>
-              <span className="text-muted-foreground text-token-sm ml-token-1">{plan.period}</span>
+              {plan.period && (
+                <span className="text-muted-foreground text-token-sm ml-token-1">{plan.period}</span>
+              )}
             </div>
+            <p className="text-token-sm text-muted-foreground mb-token-6">{plan.description}</p>
             <ul className="flex-1 space-y-3 mb-token-8">
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-token-2 text-token-sm text-muted-foreground">
