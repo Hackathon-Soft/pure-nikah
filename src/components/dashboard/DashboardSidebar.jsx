@@ -1,6 +1,6 @@
 import {
   FiHome, FiUser, FiSearch, FiHeart, FiMessageSquare, FiBell,
-  FiSettings, FiShield, FiStar, FiEdit, FiCamera, FiSliders,
+  FiSettings, FiShield, FiStar, FiEdit, FiCamera, FiSliders, FiEye, FiSlash,
 } from "react-icons/fi";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, Link } from "react-router-dom";
@@ -23,6 +23,7 @@ const matchItems = [
   { title: "Search", url: "/dashboard/search", icon: FiSearch },
   { title: "Nearby Matches", url: "/dashboard/nearby", icon: FiSearch },
   { title: "Interests", url: "/dashboard/interests", icon: FiHeart },
+  { title: "Who Viewed Me", url: "/dashboard/who-viewed-me", icon: FiEye },
   { title: "Favorites", url: "/dashboard/favorites", icon: FiStar },
   { title: "Messages", url: "/dashboard/messages", icon: FiMessageSquare },
 ];
@@ -30,6 +31,7 @@ const matchItems = [
 const accountItems = [
   { title: "Verification", url: "/dashboard/verification", icon: FiShield },
   { title: "Notifications", url: "/dashboard/notifications", icon: FiBell },
+  { title: "Blocked Users", url: "/dashboard/blocked-users", icon: FiSlash },
   { title: "Settings", url: "/dashboard/settings", icon: FiSettings },
 ];
 
