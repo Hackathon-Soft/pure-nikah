@@ -199,7 +199,7 @@ const CreateProfile = () => {
   const progress = (currentStep / steps.length) * 100;
 
   const validateCurrentStep = async (): Promise<boolean> => {
-    const schemas: Record<number, z.ZodSchema> = {
+    const schemas: Record<number, yup.ObjectSchema<any>> = {
       1: basicInfoSchema,
       2: religiousInfoSchema,
       3: lifestyleSchema,
@@ -210,17 +210,22 @@ const CreateProfile = () => {
 
     const currentSchema = schemas[currentStep];
     const values = methods.getValues();
-    const result = currentSchema.safeParse(values);
 
-    if (!result.success) {
-      result.error.errors.forEach((err) => {
-        methods.setError(err.path.join(".") as keyof ProfileFormData, {
-          message: err.message,
+    try {
+      await currentSchema.validate(values, { abortEarly: false });
+      return true;
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((e) => {
+          if (e.path) {
+            methods.setError(e.path as keyof ProfileFormData, {
+              message: e.message,
+            });
+          }
         });
-      });
+      }
       return false;
     }
-    return true;
   };
 
   const handleNext = async () => {
