@@ -1,57 +1,47 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { FiCheck } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
+import { FiCheck, FiHeart } from "react-icons/fi";
+import { GoShieldCheck } from "react-icons/go";
 import { Link } from "react-router-dom";
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
+    name: "Free Forever",
+    price: "Free",
+    period: "",
+    description: "Everything you need to find your match",
     features: [
-      "Create profile",
-      "Basic search filters",
-      "5 interests per day",
-      "Limited messaging",
-      "View basic profiles",
-    ],
-    cta: "Get Started",
-    variant: "outline" as const,
-    popular: false,
-  },
-  {
-    name: "Premium",
-    price: "$19",
-    period: "/month",
-    features: [
-      "Everything in Free",
+      "Create full profile",
+      "Unlimited search & filters",
+      "Send & receive interests",
       "Unlimited messaging",
-      "Advanced search filters",
-      "See who viewed you",
-      "Priority support",
-      "Compatibility scoring",
-      "Verified badge",
+      "View all profiles",
+      "Location-based search",
+      "Caste & preference filters",
+      "CNIC verified badge",
     ],
-    cta: "Go Premium",
+    cta: "Join Free",
     variant: "hero" as const,
     popular: true,
+    icon: GoShieldCheck,
   },
   {
-    name: "Gold",
-    price: "$39",
-    period: "/month",
+    name: "Supporter",
+    price: "PKR 500",
+    period: "/one-time",
+    description: "Optional donation to support the platform",
     features: [
-      "Everything in Premium",
-      "AI match recommendations",
-      "Video introduction",
-      "Marriage counselor access",
-      "Profile boost weekly",
-      "Wali management tools",
+      "Everything in Free",
+      "Profile boost for 30 days",
+      "Priority in search results",
+      "Support the community",
+      "Special supporter badge",
+      "Help keep PureNikah running",
     ],
-    cta: "Choose Gold",
+    cta: "Support Us",
     variant: "gold" as const,
     popular: false,
+    icon: FiHeart,
   },
 ];
 
@@ -64,16 +54,16 @@ const PricingSection = () => (
         viewport={{ once: true }}
         className="text-center mb-token-14"
       >
-        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">Plans</span>
+        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">No Hidden Fees</span>
         <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">
-          Simple, Transparent Pricing
+          100% Free — No Barriers to Nikah
         </h2>
-        <p className="text-muted-foreground mt-token-3 max-w-md mx-auto">
-          Start for free and upgrade when you're ready for more features.
+        <p className="text-muted-foreground mt-token-3 max-w-lg mx-auto">
+          We believe finding a life partner shouldn't cost money. PureNikah is completely free. Optionally support us if you'd like to keep the platform running.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-token-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-token-8 max-w-4xl mx-auto">
         {plans.map((plan, i) => (
           <motion.div
             key={plan.name}
@@ -83,19 +73,29 @@ const PricingSection = () => (
             transition={{ delay: i * 0.15 }}
             className={`relative rounded-2xl bg-card border p-token-8 flex flex-col ${
               plan.popular
-                ? "border-primary shadow-elevated scale-105"
+                ? "border-primary shadow-elevated"
                 : "border-border shadow-card"
             }`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary text-primary-foreground text-token-xs font-semibold px-token-4 py-token-1 rounded-full flex items-center gap-token-1">
-                <FaStar style={{ fontSize: "var(--text-xs)" }} /> Most Popular
+                <GoShieldCheck style={{ fontSize: "var(--text-xs)" }} /> Recommended
               </div>
             )}
-            <h3 className="font-display text-token-xl font-bold text-foreground">{plan.name}</h3>
-            <div className="mt-token-4 mb-token-6">
+            <div className="flex items-center gap-token-3 mb-token-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <plan.icon className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} />
+              </div>
+              <div>
+                <h3 className="font-display text-token-xl font-bold text-foreground">{plan.name}</h3>
+                <p className="text-token-xs text-muted-foreground">{plan.description}</p>
+              </div>
+            </div>
+            <div className="mb-token-6">
               <span className="text-token-4xl font-bold text-foreground">{plan.price}</span>
-              <span className="text-muted-foreground text-token-sm ml-token-1">{plan.period}</span>
+              {plan.period && (
+                <span className="text-muted-foreground text-token-sm ml-token-1">{plan.period}</span>
+              )}
             </div>
             <ul className="flex-1 space-y-3 mb-token-8">
               {plan.features.map((f) => (

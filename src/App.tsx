@@ -8,7 +8,11 @@ import About from "./pages/About";
 import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Search from "./pages/Search";
+import Dashboard from "./pages/Dashboard";
+import Verification from "./pages/Verification";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +29,11 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/verification" element={<Verification />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
