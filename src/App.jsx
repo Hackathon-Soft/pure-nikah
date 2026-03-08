@@ -5,10 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/admin/AdminRoute";
 
 import PublicLayout from "./components/layout/PublicLayout";
 import AuthLayout from "./components/layout/AuthLayout";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import AdminLayout from "./components/admin/AdminLayout";
 
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -38,6 +40,11 @@ import Settings from "./pages/dashboard/Settings";
 import WhoViewedMe from "./pages/dashboard/WhoViewedMe";
 import Photos from "./pages/dashboard/Photos";
 import BlockedUsers from "./pages/dashboard/BlockedUsers";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminVerification from "./pages/admin/AdminVerification";
+import AdminReports from "./pages/admin/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +95,14 @@ const App = () => (
               <Route path="notifications" element={<Notifications />} />
               <Route path="settings" element={<Settings />} />
               <Route path="blocked-users" element={<BlockedUsers />} />
+            </Route>
+
+            {/* Admin Panel — PROTECTED + ADMIN ROLE */}
+            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="verification" element={<AdminVerification />} />
+              <Route path="reports" element={<AdminReports />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
