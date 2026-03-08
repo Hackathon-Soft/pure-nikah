@@ -34,16 +34,16 @@ const faqs = [
 ];
 
 const FAQSection = () => (
-  <section className="py-20">
-    <div className="container mx-auto px-4 max-w-3xl">
+  <section className="section-padding">
+    <div className="container mx-auto px-token-4 max-w-3xl">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-14"
+        className="text-center mb-token-14"
       >
-        <span className="text-sm font-semibold text-accent uppercase tracking-wider">FAQ</span>
-        <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mt-2">
+        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">FAQ</span>
+        <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">
           Frequently Asked Questions
         </h2>
       </motion.div>
@@ -53,12 +53,12 @@ const FAQSection = () => (
           <AccordionItem
             key={i}
             value={`faq-${i}`}
-            className="bg-card border border-border rounded-xl px-6 shadow-card"
+            className="bg-card border border-border rounded-xl px-token-6 shadow-card"
           >
             <AccordionTrigger className="text-left font-display font-semibold text-foreground hover:no-underline">
               {faq.q}
             </AccordionTrigger>
-            <AccordionContent className="text-muted-foreground leading-relaxed">
+            <AccordionContent className="text-muted-foreground leading-token-relaxed">
               {faq.a}
             </AccordionContent>
           </AccordionItem>

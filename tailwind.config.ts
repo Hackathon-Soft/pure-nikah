@@ -14,8 +14,44 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Playfair Display', 'serif'],
-        body: ['DM Sans', 'sans-serif'],
+        display: ["var(--font-display)"],
+        body: ["var(--font-body)"],
+      },
+      fontSize: {
+        "token-xs": "var(--text-xs)",
+        "token-sm": "var(--text-sm)",
+        "token-base": "var(--text-base)",
+        "token-lg": "var(--text-lg)",
+        "token-xl": "var(--text-xl)",
+        "token-2xl": "var(--text-2xl)",
+        "token-3xl": "var(--text-3xl)",
+        "token-4xl": "var(--text-4xl)",
+        "token-5xl": "var(--text-5xl)",
+        "token-6xl": "var(--text-6xl)",
+      },
+      lineHeight: {
+        "token-tight": "var(--leading-tight)",
+        "token-snug": "var(--leading-snug)",
+        "token-normal": "var(--leading-normal)",
+        "token-relaxed": "var(--leading-relaxed)",
+      },
+      spacing: {
+        "token-1": "var(--space-1)",
+        "token-2": "var(--space-2)",
+        "token-3": "var(--space-3)",
+        "token-4": "var(--space-4)",
+        "token-5": "var(--space-5)",
+        "token-6": "var(--space-6)",
+        "token-8": "var(--space-8)",
+        "token-10": "var(--space-10)",
+        "token-12": "var(--space-12)",
+        "token-14": "var(--space-14)",
+        "token-16": "var(--space-16)",
+        "token-20": "var(--space-20)",
+        "token-24": "var(--space-24)",
+        "section": "var(--space-section)",
+        "section-lg": "var(--space-section-lg)",
+        "navbar": "var(--size-navbar)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -63,26 +99,33 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
+        full: "var(--radius-full)",
+      },
+      transitionDuration: {
+        fast: "150ms",
+        base: "250ms",
+        slow: "400ms",
+      },
+      zIndex: {
+        dropdown: "var(--z-dropdown)",
+        sticky: "var(--z-sticky)",
+        overlay: "var(--z-overlay)",
+        modal: "var(--z-modal)",
+        toast: "var(--z-toast)",
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
