@@ -132,7 +132,7 @@
 | Public Pages | 7 | 1 (Contact standalone) |
 | Auth Pages | 6 | 1 (Phone OTP) |
 | Verification Pages | 2 | 5 |
-| Dashboard Pages | 7 | 3 |
+| Dashboard Pages | 9 | 1 |
 | Admin Panel | 0 | 8 |
 | Backend/Database | 0 | 10+ |
 | Anti-Spam | 0 | 5 |
