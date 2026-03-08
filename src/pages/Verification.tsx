@@ -1,5 +1,3 @@
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,18 +98,15 @@ const Verification = () => {
   const canSubmit = status === "not_submitted" || status === "rejected" || status === "expired";
 
   return (
-    <>
-      <Navbar />
-      <main className="pt-navbar min-h-screen bg-muted islamic-pattern">
-        <div className="container mx-auto px-token-4 py-token-10 max-w-2xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
-              Identity Verification
-            </h1>
-            <p className="text-muted-foreground mb-token-8">
-              Verify your identity to build trust and prevent spam. Verification is reviewed by our team and expires every 6 months.
-            </p>
-          </motion.div>
+    <div className="w-full max-w-2xl">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
+          Identity Verification
+        </h1>
+        <p className="text-muted-foreground mb-token-8">
+          Verify your identity to build trust and prevent spam. Verification is reviewed by our team and expires every 6 months.
+        </p>
+      </motion.div>
 
           {/* Status Banner */}
           <motion.div
@@ -303,10 +298,7 @@ const Verification = () => {
               </form>
             </motion.div>
           )}
-        </div>
-      </main>
-      <Footer />
-    </>
+    </div>
   );
 };
 

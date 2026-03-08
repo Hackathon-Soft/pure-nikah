@@ -1,5 +1,3 @@
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -19,18 +17,15 @@ const steps = [
 
 const VerificationStatus = () => {
   return (
-    <>
-      <Navbar />
-      <main className="pt-navbar min-h-screen bg-muted islamic-pattern">
-        <div className="container mx-auto px-token-4 py-token-10 max-w-2xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
-              Verification Status
-            </h1>
-            <p className="text-muted-foreground mb-token-8">
-              Track the progress of your identity verification.
-            </p>
-          </motion.div>
+    <div className="w-full max-w-2xl">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
+          Verification Status
+        </h1>
+        <p className="text-muted-foreground mb-token-8">
+          Track the progress of your identity verification.
+        </p>
+      </motion.div>
 
           {/* Current Status */}
           <motion.div
@@ -134,10 +129,7 @@ const VerificationStatus = () => {
               </Button>
             </div>
           </motion.div>
-        </div>
-      </main>
-      <Footer />
-    </>
+    </div>
   );
 };
 

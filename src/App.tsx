@@ -16,6 +16,7 @@ import Verification from "./pages/Verification";
 import VerificationStatus from "./pages/VerificationStatus";
 import NotFound from "./pages/NotFound";
 
+import AuthLayout from "./components/layout/AuthLayout";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import ProfileView from "./pages/dashboard/ProfileView";
@@ -38,14 +39,18 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/pricing" element={<Pricing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/verification" element={<Verification />} />
-          <Route path="/verification-status" element={<VerificationStatus />} />
           <Route path="/search" element={<Search />} />
+
+          {/* Auth pages with minimal layout */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/verification" element={<Verification />} />
+            <Route path="/verification-status" element={<VerificationStatus />} />
+          </Route>
 
           {/* Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout />}>

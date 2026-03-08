@@ -44,82 +44,76 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted islamic-pattern px-token-4 py-token-10">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-card rounded-2xl shadow-elevated border border-border p-token-8"
-      >
-        <div className="text-center mb-token-8">
-          <Link to="/" className="inline-flex items-center gap-token-2 mb-token-4">
-            <FaHeart className="text-primary" style={{ fontSize: "var(--size-icon-xl)" }} />
-            <span className="font-display text-token-2xl font-bold text-foreground">PureNikah</span>
-          </Link>
-          <h1 className="font-display text-token-2xl font-bold text-foreground">Create Account</h1>
-          <p className="text-muted-foreground text-token-sm mt-token-1">Begin your journey to a blessed marriage</p>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-md bg-card rounded-2xl shadow-elevated border border-border p-token-8"
+    >
+      <div className="text-center mb-token-8">
+        <h1 className="font-display text-token-2xl font-bold text-foreground">Create Account</h1>
+        <p className="text-muted-foreground text-token-sm mt-token-1">Begin your journey to a blessed marriage</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <Label htmlFor="name">Full Name</Label>
+          <Input id="name" placeholder="Your full name" {...register("name")} className="mt-token-1" />
+          {errors.name && <p className="text-token-sm text-destructive mt-token-1">{errors.name.message}</p>}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" placeholder="Your full name" {...register("name")} className="mt-token-1" />
-            {errors.name && <p className="text-token-sm text-destructive mt-token-1">{errors.name.message}</p>}
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
+          {errors.email && <p className="text-token-sm text-destructive mt-token-1">{errors.email.message}</p>}
+        </div>
+
+        <div>
+          <Label>Gender</Label>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger className="mt-token-1">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Brother (Male)</SelectItem>
+                  <SelectItem value="female">Sister (Female)</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.gender && <p className="text-token-sm text-destructive mt-token-1">{errors.gender.message}</p>}
+        </div>
+
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <div className="relative mt-token-1">
+            <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters" {...register("password")} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}
+            </button>
           </div>
+          {errors.password && <p className="text-token-sm text-destructive mt-token-1">{errors.password.message}</p>}
+        </div>
 
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
-            {errors.email && <p className="text-token-sm text-destructive mt-token-1">{errors.email.message}</p>}
-          </div>
+        <div>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input id="confirmPassword" type="password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />
+          {errors.confirmPassword && <p className="text-token-sm text-destructive mt-token-1">{errors.confirmPassword.message}</p>}
+        </div>
 
-          <div>
-            <Label>Gender</Label>
-            <Controller
-              name="gender"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="mt-token-1">
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Brother (Male)</SelectItem>
-                    <SelectItem value="female">Sister (Female)</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.gender && <p className="text-token-sm text-destructive mt-token-1">{errors.gender.message}</p>}
-          </div>
+        <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
+          Create Account
+        </Button>
+      </form>
 
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <div className="relative mt-token-1">
-              <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters" {...register("password")} />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}
-              </button>
-            </div>
-            {errors.password && <p className="text-token-sm text-destructive mt-token-1">{errors.password.message}</p>}
-          </div>
-
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input id="confirmPassword" type="password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />
-            {errors.confirmPassword && <p className="text-token-sm text-destructive mt-token-1">{errors.confirmPassword.message}</p>}
-          </div>
-
-          <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
-            Create Account
-          </Button>
-        </form>
-
-        <p className="text-center text-token-sm text-muted-foreground mt-token-6">
-          Already have an account?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">Sign In</Link>
-        </p>
-      </motion.div>
-    </div>
+      <p className="text-center text-token-sm text-muted-foreground mt-token-6">
+        Already have an account?{" "}
+        <Link to="/login" className="text-primary font-medium hover:underline">Sign In</Link>
+      </p>
+    </motion.div>
   );
 };
 
