@@ -145,7 +145,7 @@
 
 ## 🔜 RECOMMENDED NEXT STEPS
 
-1. **Create Profile / Edit Profile form** — largest missing user-facing feature
+1. **Admin Panel** — verification queue, user management, reports, analytics
 2. **Admin Panel** — verification queue, user management, reports
 3. **Enable Lovable Cloud** — database, auth, file storage, edge functions
 4. **Remaining verification screens** — OTP, selfie, approved/rejected/re-verify
