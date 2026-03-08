@@ -7,8 +7,8 @@
 @layer base {
   :root {
     /* ── Fonts ── */
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
 
     /* ── Font Sizes ── */
     --text-xs: 0.75rem;
