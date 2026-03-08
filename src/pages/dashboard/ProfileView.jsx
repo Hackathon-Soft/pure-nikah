@@ -121,6 +121,16 @@ const ProfileView = () => {
                 )}
               </div>
 
+              {/* Compatibility Badge */}
+              <div className="mx-auto sm:mx-0">
+                <CompatibilityBadge
+                  score={compatibilityScore}
+                  preferences={myPreferences}
+                  candidate={candidateData}
+                  size="lg"
+                />
+              </div>
+
               {/* Info */}
               <div className="flex-1 text-center sm:text-left">
                 <div className="flex items-center justify-center sm:justify-start gap-token-2 flex-wrap">
