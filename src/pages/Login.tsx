@@ -26,7 +26,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginForm>({ resolver: yupResolver(loginSchema) });
 
   const onSubmit = (data: LoginForm) => {
     toast({

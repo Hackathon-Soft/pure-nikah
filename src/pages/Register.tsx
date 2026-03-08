@@ -33,7 +33,7 @@ const Register = () => {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
+  } = useForm<RegisterForm>({ resolver: yupResolver(registerSchema) });
 
   const onSubmit = (data: RegisterForm) => {
     toast({

@@ -33,7 +33,7 @@ const HelpCenter = () => {
   const { toast } = useToast();
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset } = useForm<HelpForm>({
-    resolver: zodResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const onSubmit = (_data: HelpForm) => {

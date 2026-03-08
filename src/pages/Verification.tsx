@@ -81,7 +81,7 @@ const Verification = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<VerificationForm>({ resolver: zodResolver(verificationSchema) });
+  } = useForm<VerificationForm>({ resolver: yupResolver(verificationSchema) });
 
   const onSubmit = (_data: VerificationForm) => {
     if (!cnicFront || !cnicBack) {
