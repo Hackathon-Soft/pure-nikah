@@ -17,7 +17,10 @@ const schema = yup.object({
     .required("Please confirm your password"),
 });
 
-type FormData = yup.InferType<typeof schema>;
+type FormData = {
+  password: string;
+  confirmPassword: string;
+};
 
 const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
