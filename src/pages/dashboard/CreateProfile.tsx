@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm, FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,77 +27,114 @@ import MarriagePreferencesStep from "@/components/profile/MarriagePreferencesSte
 import PhotoUploadStep from "@/components/profile/PhotoUploadStep";
 
 // Validation schemas for each step
-const basicInfoSchema = z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
-  height: z.string().min(1, "Height is required"),
-  city: z.string().min(2, "City is required"),
-  country: z.string().min(2, "Country is required"),
-  maritalStatus: z.enum(["never_married", "divorced", "widowed"], {
-    required_error: "Marital status is required",
-  }),
-  bio: z.string().max(500, "Bio must be 500 characters or less").optional(),
+const basicInfoSchema = yup.object({
+  firstName: yup.string().min(2, "First name is required").required("First name is required"),
+  lastName: yup.string().min(2, "Last name is required").required("Last name is required"),
+  dateOfBirth: yup.string().min(1, "Date of birth is required").required("Date of birth is required"),
+  gender: yup.string().oneOf(["male", "female"], "Gender is required").required("Gender is required"),
+  height: yup.string().min(1, "Height is required").required("Height is required"),
+  city: yup.string().min(2, "City is required").required("City is required"),
+  country: yup.string().min(2, "Country is required").required("Country is required"),
+  maritalStatus: yup.string().oneOf(["never_married", "divorced", "widowed"], "Marital status is required").required("Marital status is required"),
+  bio: yup.string().max(500, "Bio must be 500 characters or less").optional(),
 });
 
-const religiousInfoSchema = z.object({
-  sect: z.string().min(1, "Sect is required"),
-  prayerLevel: z.string().min(1, "Prayer level is required"),
-  hijabBeard: z.string().optional(),
-  islamicValues: z.string().min(1, "Islamic values level is required"),
-  religiousPractice: z.string().min(1, "Religious practice level is required"),
-  quranRecitation: z.string().optional(),
+const religiousInfoSchema = yup.object({
+  sect: yup.string().min(1, "Sect is required").required("Sect is required"),
+  prayerLevel: yup.string().min(1, "Prayer level is required").required("Prayer level is required"),
+  hijabBeard: yup.string().optional(),
+  islamicValues: yup.string().min(1, "Islamic values level is required").required("Islamic values is required"),
+  religiousPractice: yup.string().min(1, "Religious practice level is required").required("Religious practice is required"),
+  quranRecitation: yup.string().optional(),
 });
 
-const lifestyleSchema = z.object({
-  education: z.string().min(1, "Education is required"),
-  profession: z.string().min(1, "Profession is required"),
-  incomeRange: z.string().optional(),
-  languages: z.array(z.string()).min(1, "Select at least one language"),
-  smoking: z.string().optional(),
-  dietary: z.string().optional(),
+const lifestyleSchema = yup.object({
+  education: yup.string().min(1, "Education is required").required("Education is required"),
+  profession: yup.string().min(1, "Profession is required").required("Profession is required"),
+  incomeRange: yup.string().optional(),
+  languages: yup.array().of(yup.string().required()).min(1, "Select at least one language").required(),
+  smoking: yup.string().optional(),
+  dietary: yup.string().optional(),
 });
 
-const familyBackgroundSchema = z.object({
-  caste: z.string().optional(),
-  familyType: z.string().min(1, "Family type is required"),
-  familyValues: z.string().optional(),
-  livingWith: z.string().min(1, "Living situation is required"),
-  siblings: z.string().optional(),
-  fatherOccupation: z.string().optional(),
-  motherOccupation: z.string().optional(),
+const familyBackgroundSchema = yup.object({
+  caste: yup.string().optional(),
+  familyType: yup.string().min(1, "Family type is required").required("Family type is required"),
+  familyValues: yup.string().optional(),
+  livingWith: yup.string().min(1, "Living situation is required").required("Living situation is required"),
+  siblings: yup.string().optional(),
+  fatherOccupation: yup.string().optional(),
+  motherOccupation: yup.string().optional(),
 });
 
-const marriagePreferencesSchema = z.object({
-  preferredAgeMin: z.number().min(18, "Minimum age is 18"),
-  preferredAgeMax: z.number().max(70, "Maximum age is 70"),
-  preferredLocation: z.string().optional(),
-  preferredCaste: z.string().optional(),
-  preferredEducation: z.string().optional(),
-  religiousExpectations: z.string().min(1, "Religious expectations required"),
-  willingToRelocate: z.boolean().optional(),
-  acceptDivorced: z.boolean().optional(),
-  acceptWithChildren: z.boolean().optional(),
+const marriagePreferencesSchema = yup.object({
+  preferredAgeMin: yup.number().min(18, "Minimum age is 18").required(),
+  preferredAgeMax: yup.number().max(70, "Maximum age is 70").required(),
+  preferredLocation: yup.string().optional(),
+  preferredCaste: yup.string().optional(),
+  preferredEducation: yup.string().optional(),
+  religiousExpectations: yup.string().min(1, "Religious expectations required").required("Religious expectations required"),
+  willingToRelocate: yup.boolean().optional(),
+  acceptDivorced: yup.boolean().optional(),
+  acceptWithChildren: yup.boolean().optional(),
 });
 
-const photoUploadSchema = z.object({
-  profilePhoto: z.string().optional(),
-  additionalPhotos: z.array(z.string()).optional(),
-  photoPrivacy: z.enum(["public", "blur_until_accepted", "private"]),
+const photoUploadSchema = yup.object({
+  profilePhoto: yup.string().optional(),
+  additionalPhotos: yup.array().of(yup.string().required()).optional(),
+  photoPrivacy: yup.string().oneOf(["public", "blur_until_accepted", "private"]).required("Photo privacy is required"),
 });
 
 // Combined schema
-const fullProfileSchema = z.object({
-  ...basicInfoSchema.shape,
-  ...religiousInfoSchema.shape,
-  ...lifestyleSchema.shape,
-  ...familyBackgroundSchema.shape,
-  ...marriagePreferencesSchema.shape,
-  ...photoUploadSchema.shape,
-});
+const fullProfileSchema = basicInfoSchema
+  .concat(religiousInfoSchema)
+  .concat(lifestyleSchema)
+  .concat(familyBackgroundSchema)
+  .concat(marriagePreferencesSchema)
+  .concat(photoUploadSchema);
 
-export type ProfileFormData = z.infer<typeof fullProfileSchema>;
+export type ProfileFormData = {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  height: string;
+  city: string;
+  country: string;
+  maritalStatus: string;
+  bio?: string;
+  sect: string;
+  prayerLevel: string;
+  hijabBeard?: string;
+  islamicValues: string;
+  religiousPractice: string;
+  quranRecitation?: string;
+  education: string;
+  profession: string;
+  incomeRange?: string;
+  languages: string[];
+  smoking?: string;
+  dietary?: string;
+  caste?: string;
+  familyType: string;
+  familyValues?: string;
+  livingWith: string;
+  siblings?: string;
+  fatherOccupation?: string;
+  motherOccupation?: string;
+  preferredAgeMin: number;
+  preferredAgeMax: number;
+  preferredLocation?: string;
+  preferredCaste?: string;
+  preferredEducation?: string;
+  religiousExpectations: string;
+  willingToRelocate?: boolean;
+  acceptDivorced?: boolean;
+  acceptWithChildren?: boolean;
+  profilePhoto?: string;
+  additionalPhotos?: string[];
+  photoPrivacy: string;
+};
 
 const steps = [
   { id: 1, title: "Basic Info", icon: FiUser, description: "Personal details" },
