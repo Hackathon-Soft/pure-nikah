@@ -33,7 +33,14 @@ const verificationSchema = yup.object({
     .required("Phone number is required"),
 });
 
-type VerificationForm = yup.InferType<typeof verificationSchema>;
+type VerificationForm = {
+  cnicNumber: string;
+  fullName: string;
+  fatherName: string;
+  dateOfBirth: string;
+  address: string;
+  phoneNumber: string;
+};
 
 type VerificationStatus = "not_submitted" | "pending" | "verified" | "rejected" | "expired";
 
