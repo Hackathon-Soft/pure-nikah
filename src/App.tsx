@@ -53,6 +53,9 @@ const App = () => (
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/verification" element={<Verification />} />
             <Route path="/verification-status" element={<VerificationStatus />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/help" element={<HelpCenter />} />
           </Route>
 
           {/* Dashboard */}
