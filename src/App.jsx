@@ -52,6 +52,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/profile/:id" element={<ProfileDetail />} />
           </Route>
 
           {/* Auth pages with minimal layout */}

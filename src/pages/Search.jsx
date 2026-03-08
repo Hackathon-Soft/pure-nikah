@@ -195,7 +195,9 @@ const SearchPage = () => {
                   </div>
                   <div className="flex gap-token-2 mt-token-4">
                     <Button variant="hero" size="sm" className="flex-1"><FiHeart className="mr-token-1" style={{ fontSize: "var(--text-xs)" }} /> Interest</Button>
-                    <Button variant="outline" size="sm" className="flex-1">View Profile</Button>
+                    <Button variant="outline" size="sm" className="flex-1" asChild>
+                      <Link to={`/profile/${profile.id}`}>View Profile</Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
