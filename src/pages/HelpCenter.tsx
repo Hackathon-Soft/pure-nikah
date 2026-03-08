@@ -6,19 +6,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FiMail, FiMessageCircle, FiHelpCircle, FiBook, FiSend } from "react-icons/fi";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
-const schema = z.object({
-  name: z.string().min(2, "Name is required").max(100),
-  email: z.string().email("Please enter a valid email").max(255),
-  topic: z.string().min(1, "Please select a topic"),
-  message: z.string().min(10, "Message must be at least 10 characters").max(1000),
+const schema = yup.object({
+  name: yup.string().min(2, "Name is required").max(100).required("Name is required"),
+  email: yup.string().email("Please enter a valid email").max(255).required("Email is required"),
+  topic: yup.string().min(1, "Please select a topic").required("Topic is required"),
+  message: yup.string().min(10, "Message must be at least 10 characters").max(1000).required("Message is required"),
 });
 
-type HelpForm = z.infer<typeof schema>;
+type HelpForm = yup.InferType<typeof schema>;
 
 const faqs = [
   { q: "How do I verify my account?", a: "Go to Dashboard → Verification and upload your CNIC (front & back) plus a selfie. Our team reviews within 24-48 hours." },
