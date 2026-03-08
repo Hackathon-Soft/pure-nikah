@@ -16,7 +16,10 @@ const loginSchema = yup.object({
   password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
 });
 
-type LoginForm = yup.InferType<typeof loginSchema>;
+type LoginForm = {
+  email: string;
+  password: string;
+};
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
