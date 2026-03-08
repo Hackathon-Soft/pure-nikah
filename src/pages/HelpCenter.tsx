@@ -18,7 +18,12 @@ const schema = yup.object({
   message: yup.string().min(10, "Message must be at least 10 characters").max(1000).required("Message is required"),
 });
 
-type HelpForm = yup.InferType<typeof schema>;
+type HelpForm = {
+  name: string;
+  email: string;
+  topic: string;
+  message: string;
+};
 
 const faqs = [
   { q: "How do I verify my account?", a: "Go to Dashboard → Verification and upload your CNIC (front & back) plus a selfie. Our team reviews within 24-48 hours." },
