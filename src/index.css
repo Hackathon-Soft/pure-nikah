@@ -192,6 +192,168 @@
   h4 { font-size: var(--text-lg); font-weight: var(--font-semibold); }
 }
 
+@layer components {
+  /* ── Layout ── */
+  .app-container {
+    @apply container mx-auto px-token-4;
+  }
+
+  /* ── Section Headers ── */
+  .section-label {
+    @apply text-token-sm font-semibold text-accent uppercase tracking-wider;
+  }
+
+  .section-title {
+    @apply text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2;
+  }
+
+  .section-subtitle {
+    @apply text-muted-foreground mt-token-3 max-w-md mx-auto;
+  }
+
+  .section-header {
+    @apply text-center mb-token-14;
+  }
+
+  /* ── Page Titles ── */
+  .page-title {
+    @apply text-token-2xl md:text-token-3xl font-display font-bold text-foreground;
+  }
+
+  .page-subtitle {
+    @apply text-muted-foreground text-token-sm mt-token-1;
+  }
+
+  /* ── Cards ── */
+  .card-base {
+    @apply bg-card border border-border rounded-xl shadow-card;
+  }
+
+  .card-elevated {
+    @apply bg-card rounded-2xl shadow-elevated border border-border p-token-8;
+  }
+
+  .card-section-title {
+    @apply font-display text-token-lg font-semibold text-foreground;
+  }
+
+  /* ── Avatars & Icons ── */
+  .avatar-circle {
+    @apply rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold;
+  }
+
+  .avatar-circle-gold {
+    @apply rounded-full bg-gradient-gold flex items-center justify-center text-accent-foreground font-bold;
+  }
+
+  .icon-circle {
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-primary text-primary-foreground shadow-elevated;
+  }
+
+  .icon-box {
+    @apply flex-shrink-0 rounded-lg bg-primary/10 flex items-center justify-center;
+  }
+
+  /* ── Pills & Tabs ── */
+  .pill-active {
+    @apply bg-gradient-primary text-primary-foreground rounded-full px-token-5 py-token-2 text-token-sm font-medium;
+  }
+
+  .pill-inactive {
+    @apply bg-card border border-border text-muted-foreground hover:text-foreground rounded-full px-token-5 py-token-2 text-token-sm font-medium transition-colors;
+  }
+
+  /* ── Badges & Tags ── */
+  .badge-sm {
+    @apply text-token-xs px-token-2 py-token-1 rounded-full;
+  }
+
+  .badge-primary {
+    @apply badge-sm bg-primary/10 text-primary;
+  }
+
+  .badge-accent {
+    @apply badge-sm bg-accent/20 text-accent-foreground;
+  }
+
+  .badge-muted {
+    @apply badge-sm bg-muted text-muted-foreground;
+  }
+
+  .badge-status-accepted {
+    @apply badge-sm bg-primary/10 text-primary font-medium;
+  }
+
+  .badge-status-pending {
+    @apply badge-sm bg-accent/20 text-accent-foreground font-medium;
+  }
+
+  /* ── List Items ── */
+  .list-item-muted {
+    @apply flex items-center gap-token-3 p-token-3 rounded-lg bg-muted;
+  }
+
+  /* ── Forms ── */
+  .form-error {
+    @apply text-token-sm text-destructive mt-token-1;
+  }
+
+  /* ── Auth Forms ── */
+  .auth-card {
+    @apply w-full max-w-md card-elevated;
+  }
+
+  .auth-header {
+    @apply text-center mb-token-8;
+  }
+
+  .auth-title {
+    @apply font-display text-token-2xl font-bold text-foreground;
+  }
+
+  /* ── Links ── */
+  .link-primary {
+    @apply text-primary font-medium hover:underline;
+  }
+
+  .link-footer {
+    @apply hover:text-accent transition-colors;
+  }
+
+  /* ── Quick Actions ── */
+  .action-card {
+    @apply flex flex-col items-center gap-token-2 p-token-4 rounded-xl bg-muted hover:bg-primary/5 transition-colors text-center;
+  }
+
+  /* ── Nav Links ── */
+  .nav-link {
+    @apply text-token-sm font-medium transition-colors hover:text-primary;
+  }
+
+  .nav-link-active {
+    @apply text-primary;
+  }
+
+  .nav-link-inactive {
+    @apply text-muted-foreground;
+  }
+
+  /* ── Password Toggle ── */
+  .password-toggle {
+    @apply absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground;
+  }
+
+  /* ── Verified Badge ── */
+  .verified-badge {
+    @apply bg-card/90 backdrop-blur-sm rounded-full px-token-2 py-token-1 flex items-center gap-token-1 text-token-xs text-primary font-medium;
+  }
+
+  /* ── Hero Chip ── */
+  .hero-chip {
+    @apply inline-flex items-center gap-token-2 bg-background/10 backdrop-blur-md rounded-full px-token-4 py-token-2 border border-background/20;
+  }
+}
+
 @layer utilities {
   .text-gradient-primary {
     background: var(--gradient-primary);
