@@ -19,8 +19,9 @@
 ### Public Pages
 - [x] **Home** — Hero, How It Works, Islamic Values, Success Stories, Pricing, FAQ, CTA
 - [x] **About** — Mission, values, team
-- [x] **Pricing** — Free Forever + Sadqa Support model
-- [x] **Search** — Advanced filters (age, city, caste, sect, education, marital status, distance/nearby)
+- [x] **Pricing** — Free Forever + Sadqa Support model + Widowed/Divorced special discounts
+- [x] **Search** — Advanced filters (age, city, caste, sect, education, marital status, distance/nearby, widowed/divorced dedicated tabs)
+- [x] **Profile Detail** (`/profile/:id`) — Dual-mode: quick view (blurred/limited) for guests, full detail page for logged-in users
 - [x] **Privacy Policy** — Full data protection, collection, sharing, retention details
 - [x] **Terms of Service** — Account rules, verification requirements, prohibited activities, enforcement
 - [x] **Help Center** — FAQs, quick links, contact form with topic selector
@@ -40,11 +41,21 @@
 ### User Dashboard (sidebar layout with nested routes)
 - [x] **Dashboard Home** — Profile completion %, activity stats (views, interests, messages), verification alert, match suggestions
 - [x] **Profile View** — Basic info, religious info, lifestyle, marriage preferences display
+- [x] **Create/Edit Profile** — Full 6-step form: basic info, religious info, lifestyle, family background, marriage preferences, photo upload with privacy settings
 - [x] **Interests** — Received/sent tabs, accept/reject actions
 - [x] **Favorites** — Saved profiles grid
 - [x] **Messages** — Conversation list + chat interface
 - [x] **Notifications** — Activity feed (interests, messages, verification, security)
 - [x] **Settings** — Privacy, notifications, security, account management sections
+- [x] **Who Viewed Me** — Visitor tracking with stats, premium upsell for anonymous browsing
+- [x] **Photos Management** — 6-slot grid, set primary, upload guidelines
+- [x] **Blocked Users** — Block management with unblock actions, info card
+
+### Features
+- [x] **Compatibility Score System** — Weighted algorithm (9 criteria: sect, caste, city, education, age, marital status, prayer, hijab, lifestyle), reusable CompatibilityBadge component with breakdown popover, integrated into Search & Profile
+- [x] **Widowed/Divorced Special Filters** — Dedicated filter tabs on Search page with contextual support banners
+- [x] **Widowed/Divorced Discounts** — Special pricing section (100% free premium for widowed, 50% off for divorced)
+- [x] **Centralized Mock Data** (`src/lib/mockProfiles.js`) — Shared profile data across Search and Profile pages
 
 ### UI Components
 - [x] Navbar (responsive, mobile menu, active link highlighting)
@@ -70,10 +81,7 @@
 - [ ] **Verification Approved** (success screen)
 - [ ] **Verification Rejected** (rejection + re-submit screen)
 - [ ] **6-Month Re-verification** (renewal prompt screen)
-- [x] **Create/Edit Profile** (full 6-step form: basic info, religious info, lifestyle, family background, marriage preferences, photo upload with privacy settings)
-- [x] **Upload Photos** (profile photo + gallery up to 5, blur-until-accepted, private, public privacy modes)
 - [ ] **Nearby Matches** (dedicated location-based page)
-- [ ] **Match Requests** (who liked your profile)
 
 ### Admin Panel (entire section)
 - [ ] Admin Dashboard (stats, charts, overview)
@@ -109,8 +117,7 @@
 - [ ] Protected routes (redirect unauthenticated users)
 - [ ] OTP phone verification (SMS integration)
 - [ ] Email sending (verification, password reset)
-- [ ] Compatibility score calculation
-- [ ] Profile completion percentage (dynamic)
+- [ ] Profile completion percentage (dynamic, database-backed)
 - [ ] Verified badge (based on verification status)
 - [ ] Block/report system (database + admin queue)
 - [ ] Premium features / payment integration
@@ -129,16 +136,17 @@
 
 | Category | Done | Remaining |
 |---|---|---|
-| Public Pages | 7 | 1 (Contact standalone) |
+| Public Pages | 8 | 1 (Contact standalone) |
 | Auth Pages | 6 | 1 (Phone OTP) |
 | Verification Pages | 2 | 5 |
-| Dashboard Pages | 9 | 1 |
+| Dashboard Pages | 13 | 1 (Nearby dedicated) |
+| Features | 4 | 5+ |
 | Admin Panel | 0 | 8 |
 | Backend/Database | 0 | 10+ |
 | Anti-Spam | 0 | 5 |
 | SEO | 0 | 5 |
 
-**Frontend UI: ~80% complete**
+**Frontend UI: ~88% complete**
 **Full-stack with backend: ~35% complete**
 
 ---
@@ -146,8 +154,7 @@
 ## 🔜 RECOMMENDED NEXT STEPS
 
 1. **Admin Panel** — verification queue, user management, reports, analytics
-2. **Admin Panel** — verification queue, user management, reports
+2. **Remaining verification screens** — OTP, selfie, approved/rejected/re-verify
 3. **Enable Lovable Cloud** — database, auth, file storage, edge functions
-4. **Remaining verification screens** — OTP, selfie, approved/rejected/re-verify
-5. **Real authentication flow** — signup → verify email → verify phone → CNIC → selfie → human review
-6. **SEO optimization** — meta tags, structured data
+4. **Real authentication flow** — signup → verify email → verify phone → CNIC → selfie → human review
+5. **SEO optimization** — meta tags, structured data, sitemap
