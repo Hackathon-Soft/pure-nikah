@@ -32,6 +32,9 @@ import Favorites from "./pages/dashboard/Favorites";
 import Messages from "./pages/dashboard/Messages";
 import Notifications from "./pages/dashboard/Notifications";
 import Settings from "./pages/dashboard/Settings";
+import WhoViewedMe from "./pages/dashboard/WhoViewedMe";
+import Photos from "./pages/dashboard/Photos";
+import BlockedUsers from "./pages/dashboard/BlockedUsers";
 
 const queryClient = new QueryClient();
 
