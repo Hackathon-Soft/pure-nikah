@@ -16,6 +16,15 @@ import Verification from "./pages/Verification";
 import VerificationStatus from "./pages/VerificationStatus";
 import NotFound from "./pages/NotFound";
 
+import DashboardLayout from "./components/dashboard/DashboardLayout";
+import DashboardHome from "./pages/dashboard/DashboardHome";
+import ProfileView from "./pages/dashboard/ProfileView";
+import Interests from "./pages/dashboard/Interests";
+import Favorites from "./pages/dashboard/Favorites";
+import Messages from "./pages/dashboard/Messages";
+import Notifications from "./pages/dashboard/Notifications";
+import Settings from "./pages/dashboard/Settings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,6 +34,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public pages */}
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/pricing" element={<Pricing />} />
@@ -36,6 +46,24 @@ const App = () => (
           <Route path="/verification" element={<Verification />} />
           <Route path="/verification-status" element={<VerificationStatus />} />
           <Route path="/search" element={<Search />} />
+
+          {/* Dashboard */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardHome />} />
+            <Route path="profile" element={<ProfileView />} />
+            <Route path="edit-profile" element={<ProfileView />} />
+            <Route path="photos" element={<ProfileView />} />
+            <Route path="preferences" element={<Settings />} />
+            <Route path="search" element={<Search />} />
+            <Route path="nearby" element={<Search />} />
+            <Route path="interests" element={<Interests />} />
+            <Route path="favorites" element={<Favorites />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="verification" element={<Verification />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
