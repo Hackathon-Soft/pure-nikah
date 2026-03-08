@@ -117,7 +117,7 @@ const SearchPage = () => {
                     <span className="text-token-2xl font-display font-bold text-primary">{profile.name.charAt(0)}</span>
                   </div>
                 </div>
-                <CardContent className="pt-token-14 pb-token-6 text-center">
+                <CardContent className="px-token-4 pt-token-14 pb-token-6 text-center">
                   <h3 className="card-section-title">{profile.name}</h3>
                   <p className="text-token-sm text-muted-foreground">{profile.age} years old • {profile.cast}</p>
                   <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
