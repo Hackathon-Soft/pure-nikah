@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { FiSearch, FiMapPin, FiBookOpen, FiHeart, FiFilter, FiShield } from "react-icons/fi";
+import { Link } from "react-router-dom";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useState, useMemo } from "react";
 import { calculateCompatibility } from "@/lib/compatibility";
