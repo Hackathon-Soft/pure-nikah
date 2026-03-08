@@ -6,9 +6,85 @@
 
 @layer base {
   :root {
+    /* ── Fonts ── */
     --font-display: 'Playfair Display', serif;
     --font-body: 'DM Sans', sans-serif;
 
+    /* ── Font Sizes ── */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+
+    /* ── Line Heights ── */
+    --leading-tight: 1.15;
+    --leading-snug: 1.35;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.65;
+
+    /* ── Font Weights ── */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
+    /* ── Spacing ── */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-14: 3.5rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    --space-section: 5rem;
+    --space-section-lg: 6rem;
+
+    /* ── Sizing ── */
+    --size-icon-sm: 1rem;
+    --size-icon: 1.25rem;
+    --size-icon-lg: 1.5rem;
+    --size-icon-xl: 2rem;
+    --size-avatar-sm: 2.5rem;
+    --size-avatar: 5rem;
+    --size-avatar-lg: 6rem;
+    --size-navbar: 4rem;
+    --size-container: 87.5rem;
+
+    /* ── Border Radius ── */
+    --radius: 0.75rem;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.625rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.25rem;
+    --radius-full: 9999px;
+
+    /* ── Transitions ── */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms ease;
+
+    /* ── Z-Index ── */
+    --z-dropdown: 50;
+    --z-sticky: 100;
+    --z-overlay: 200;
+    --z-modal: 300;
+    --z-toast: 400;
+
+    /* ── Colors ── */
     --background: 200 20% 97%;
     --foreground: 0 0% 10%;
 
@@ -37,8 +113,6 @@
     --input: 200 15% 89%;
     --ring: 160 56% 28%;
 
-    --radius: 0.75rem;
-
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 160 56% 28%;
@@ -48,10 +122,15 @@
     --sidebar-border: 200 15% 89%;
     --sidebar-ring: 160 56% 28%;
 
+    /* ── Gradients ── */
     --gradient-primary: linear-gradient(135deg, hsl(160, 56%, 28%), hsl(163, 45%, 38%));
     --gradient-gold: linear-gradient(135deg, hsl(38, 72%, 65%), hsl(42, 80%, 55%));
+
+    /* ── Shadows ── */
     --shadow-card: 0 4px 24px -4px hsla(160, 56%, 28%, 0.08);
     --shadow-elevated: 0 12px 40px -8px hsla(160, 56%, 28%, 0.12);
+    --shadow-sm: 0 1px 3px 0 hsla(0, 0%, 0%, 0.06);
+    --shadow-lg: 0 20px 50px -12px hsla(160, 56%, 28%, 0.15);
   }
 
   .dark {
@@ -82,6 +161,11 @@
     --sidebar-accent-foreground: 200 15% 90%;
     --sidebar-border: 200 15% 18%;
     --sidebar-ring: 160 50% 40%;
+
+    --shadow-card: 0 4px 24px -4px hsla(0, 0%, 0%, 0.2);
+    --shadow-elevated: 0 12px 40px -8px hsla(0, 0%, 0%, 0.3);
+    --shadow-sm: 0 1px 3px 0 hsla(0, 0%, 0%, 0.15);
+    --shadow-lg: 0 20px 50px -12px hsla(0, 0%, 0%, 0.35);
   }
 }
 
@@ -93,11 +177,19 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    line-height: var(--leading-tight);
   }
+
+  h1 { font-size: var(--text-4xl); font-weight: var(--font-bold); }
+  h2 { font-size: var(--text-3xl); font-weight: var(--font-bold); }
+  h3 { font-size: var(--text-xl); font-weight: var(--font-semibold); }
+  h4 { font-size: var(--text-lg); font-weight: var(--font-semibold); }
 }
 
 @layer utilities {
@@ -124,7 +216,30 @@
     box-shadow: var(--shadow-elevated);
   }
 
+  .shadow-sm-token {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .shadow-lg-token {
+    box-shadow: var(--shadow-lg);
+  }
+
   .islamic-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231F6F5B' fill-opacity='0.04'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Token-based spacing utilities */
+  .section-padding {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
+  }
+
+  .section-padding-lg {
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-lg);
+  }
+
+  .gap-section {
+    gap: var(--space-14);
   }
 }
