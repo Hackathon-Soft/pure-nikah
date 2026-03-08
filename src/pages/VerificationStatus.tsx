@@ -17,11 +17,11 @@ const steps = [
 
 const VerificationStatus = () => {
   return (
-    <>
-      <Navbar />
-      <main className="pt-navbar min-h-screen bg-muted islamic-pattern">
-        <div className="container mx-auto px-token-4 py-token-10 max-w-2xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <div className="w-full max-w-2xl">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
+          Verification Status
+        </h1>
             <h1 className="text-token-3xl font-display font-bold text-foreground mb-token-2">
               Verification Status
             </h1>
