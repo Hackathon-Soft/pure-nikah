@@ -14,6 +14,9 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Verification from "./pages/Verification";
 import VerificationStatus from "./pages/VerificationStatus";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 
 import AuthLayout from "./components/layout/AuthLayout";
