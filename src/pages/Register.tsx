@@ -8,22 +8,21 @@ import { FaHeart } from "react-icons/fa";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
 
-const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Please enter a valid email").max(255),
-  gender: z.string().min(1, "Please select your gender"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+const registerSchema = yup.object({
+  name: yup.string().min(2, "Name must be at least 2 characters").max(100).required("Name is required"),
+  email: yup.string().email("Please enter a valid email").max(255).required("Email is required"),
+  gender: yup.string().min(1, "Please select your gender").required("Gender is required"),
+  password: yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+  confirmPassword: yup.string()
+    .oneOf([yup.ref("password")], "Passwords don't match")
+    .required("Please confirm your password"),
 });
 
-type RegisterForm = z.infer<typeof registerSchema>;
+type RegisterForm = yup.InferType<typeof registerSchema>;
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
