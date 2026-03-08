@@ -14,14 +14,14 @@ const HeroSection = () => (
     <div className="absolute inset-0 bg-foreground/60" />
     <div className="absolute inset-0 islamic-pattern opacity-30" />
 
-    <div className="container mx-auto px-token-4 relative z-10">
+    <div className="app-container relative z-10">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-2xl"
       >
-        <div className="inline-flex items-center gap-token-2 bg-background/10 backdrop-blur-md rounded-full px-token-4 py-token-2 mb-token-6 border border-background/20">
+        <div className="hero-chip mb-token-6">
           <GoShieldCheck className="text-accent" style={{ fontSize: "var(--size-icon)" }} />
           <span className="text-token-sm font-medium text-background">
             Trusted by 50,000+ Muslims worldwide

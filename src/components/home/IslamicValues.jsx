@@ -11,20 +11,20 @@ const values = [
 
 const IslamicValues = () => (
   <section className="section-padding">
-    <div className="container mx-auto px-token-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-token-14">
-        <span className="text-token-sm font-semibold text-accent uppercase tracking-wider">Our Foundation</span>
-        <h2 className="text-token-3xl md:text-token-4xl font-display font-bold text-foreground mt-token-2">Built on Islamic Values</h2>
-        <p className="text-muted-foreground mt-token-3 max-w-lg mx-auto">"And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them." — Quran 30:21</p>
+    <div className="app-container">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="section-header">
+        <span className="section-label">Our Foundation</span>
+        <h2 className="section-title">Built on Islamic Values</h2>
+        <p className="section-subtitle max-w-lg">"And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them." — Quran 30:21</p>
       </motion.div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-token-6 max-w-4xl mx-auto">
         {values.map((val, i) => (
-          <motion.div key={val.title} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="flex gap-token-4 p-token-6 rounded-xl bg-card shadow-card border border-border hover:shadow-elevated transition-shadow">
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+          <motion.div key={val.title} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="flex gap-token-4 p-token-6 card-base hover:shadow-elevated transition-shadow">
+            <div className="icon-box w-12 h-12">
               <val.icon className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} />
             </div>
             <div>
-              <h3 className="font-display text-token-lg font-semibold text-foreground mb-token-1">{val.title}</h3>
+              <h3 className="card-section-title mb-token-1">{val.title}</h3>
               <p className="text-token-sm text-muted-foreground leading-token-relaxed">{val.description}</p>
             </div>
           </motion.div>
