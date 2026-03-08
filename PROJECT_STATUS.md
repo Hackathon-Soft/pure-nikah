@@ -138,8 +138,8 @@
 | Anti-Spam | 0 | 5 |
 | SEO | 0 | 5 |
 
-**Frontend UI: ~70% complete**
-**Full-stack with backend: ~30% complete**
+**Frontend UI: ~80% complete**
+**Full-stack with backend: ~35% complete**
 
 ---
 
