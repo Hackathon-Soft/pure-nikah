@@ -23,6 +23,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
+import ProfileDetail from "./pages/ProfileDetail";
 
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import ProfileView from "./pages/dashboard/ProfileView";
