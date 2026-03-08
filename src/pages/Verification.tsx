@@ -299,11 +299,7 @@ const Verification = () => {
               </form>
             </motion.div>
           )}
-        </div>
-      </main>
-      <Footer />
-    </>
-  );
+    </div>
 };
 
 export default Verification;

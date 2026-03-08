@@ -132,11 +132,7 @@ const VerificationStatus = () => {
               </Button>
             </div>
           </motion.div>
-        </div>
-      </main>
-      <Footer />
-    </>
-  );
+    </div>
 };
 
 export default VerificationStatus;
