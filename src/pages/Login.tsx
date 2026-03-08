@@ -66,7 +66,13 @@ const Login = () => {
                 {showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}
               </button>
             </div>
-            {errors.password && <p className="text-token-sm text-destructive mt-token-1">{errors.password.message}</p>}
+          {errors.password && <p className="text-token-sm text-destructive mt-token-1">{errors.password.message}</p>}
+          </div>
+
+          <div className="flex justify-end">
+            <Link to="/forgot-password" className="text-token-xs text-primary hover:underline">
+              Forgot Password?
+            </Link>
           </div>
 
           <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
