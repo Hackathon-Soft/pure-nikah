@@ -1,73 +1,129 @@
-# Welcome to your Lovable project
+# PureNikah — Islamic Matrimonial Platform
 
-## Project info
+A full-stack Islamic matrimonial web application built with React, Vite, Tailwind CSS, and Lovable Cloud (Supabase).
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Live URL**: https://pure-nikah.lovable.app
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React 18 + Vite
+- Tailwind CSS + shadcn/ui
+- Supabase (Auth, Database, Edge Functions, RLS)
+- React Query, Framer Motion, React Router
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Getting Started Locally
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Create a `.env` file in the project root:
 
-**Use GitHub Codespaces**
+```
+VITE_SUPABASE_PROJECT_ID="your-project-id"
+VITE_SUPABASE_PUBLISHABLE_KEY="your-anon-key"
+VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+See [DATABASE_SETUP.md](./DATABASE_SETUP.md) for full database replication instructions.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Admin Panel
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Access
 
-## How can I deploy this project?
+The admin panel is available at `/admin` and is **only visible to users with the `admin` role**.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### How to access
 
-## Can I connect a custom domain to my Lovable project?
+1. Log in with an admin account (e.g., `mayoubkhan558@gmail.com`)
+2. You'll see an **"Admin Panel"** link in the dashboard sidebar
+3. Click it to navigate to `/admin`
 
-Yes, you can!
+### Assigning admin role
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+To make a user an admin, run this SQL in your Supabase SQL Editor:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```sql
+INSERT INTO public.user_roles (user_id, role)
+VALUES ('USER_UUID_HERE', 'admin');
+```
+
+Find the user UUID in Authentication → Users in the Supabase dashboard.
+
+### Admin Features
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Overview | `/admin` | Platform stats (users, verified, banned, reports, signups) |
+| Users | `/admin/users` | Search, filter, verify, ban, delete users |
+| Verification | `/admin/verification` | Review and approve/reject completed profiles |
+| Reports | `/admin/reports` | Review, resolve, or dismiss user reports |
+
+---
+
+## User Roles
+
+Roles are stored in a separate `user_roles` table (never on the profile). Available roles:
+
+- `admin` — Full platform access
+- `moderator` — Content moderation (future)
+- `user` — Default role
+
+Role checks use a `has_role()` security definer function to avoid RLS recursion.
+
+---
+
+## Authentication
+
+- Email/password signup with **email verification required**
+- Auto-confirm is **disabled** — users must verify their email before logging in
+- Password reset via email with redirect to `/reset-password`
+
+---
+
+## Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `profiles` | User profile data |
+| `interests` | Interest requests between users |
+| `favorites` | Favorited profiles |
+| `conversations` | Chat conversations |
+| `messages` | Messages within conversations |
+| `notifications` | In-app notifications |
+| `profile_views` | Who viewed whose profile |
+| `blocked_users` | Blocked user relationships |
+| `user_roles` | Role assignments (admin, moderator, user) |
+| `reports` | Content moderation reports |
+
+---
+
+## Edge Functions
+
+| Function | Purpose |
+|----------|---------|
+| `admin-api` | All admin operations (stats, user management, verification, reports) — validates admin role server-side |
+
+---
+
+## Deployment
+
+- **Frontend**: Click "Publish" in Lovable, then "Update" for frontend changes
+- **Backend**: Edge functions and database migrations deploy automatically
+
+---
+
+## Custom Domain
+
+Navigate to Project → Settings → Domains in Lovable to connect your own domain.
