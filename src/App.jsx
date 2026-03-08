@@ -73,16 +73,18 @@ const App = () => (
             <Route path="profile" element={<ProfileView />} />
             <Route path="create-profile" element={<CreateProfile />} />
             <Route path="edit-profile" element={<CreateProfile />} />
-            <Route path="photos" element={<CreateProfile />} />
+            <Route path="photos" element={<Photos />} />
             <Route path="preferences" element={<Settings />} />
             <Route path="search" element={<Search />} />
             <Route path="nearby" element={<Search />} />
             <Route path="interests" element={<Interests />} />
             <Route path="favorites" element={<Favorites />} />
             <Route path="messages" element={<Messages />} />
+            <Route path="who-viewed-me" element={<WhoViewedMe />} />
             <Route path="verification" element={<Verification />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="blocked-users" element={<BlockedUsers />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

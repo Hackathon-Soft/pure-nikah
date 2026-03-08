@@ -1,6 +1,6 @@
 import {
   FiHome, FiUser, FiSearch, FiHeart, FiMessageSquare, FiBell,
-  FiSettings, FiShield, FiStar, FiEdit, FiCamera, FiSliders,
+  FiSettings, FiShield, FiStar, FiEdit, FiCamera, FiSliders, FiEye, FiSlash,
 } from "react-icons/fi";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, Link } from "react-router-dom";
