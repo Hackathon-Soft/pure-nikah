@@ -49,6 +49,8 @@ const SearchPage = () => {
   const filtered = results.filter((p) => {
     if (searchType === "male" && p.gender !== "male") return false;
     if (searchType === "female" && p.gender !== "female") return false;
+    if (searchType === "widowed" && p.maritalStatus !== "Widowed") return false;
+    if (searchType === "divorced" && p.maritalStatus !== "Divorced") return false;
     if (p.age < ageRange[0] || p.age > ageRange[1]) return false;
     return true;
   });
