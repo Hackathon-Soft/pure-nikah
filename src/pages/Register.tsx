@@ -22,7 +22,13 @@ const registerSchema = yup.object({
     .required("Please confirm your password"),
 });
 
-type RegisterForm = yup.InferType<typeof registerSchema>;
+type RegisterForm = {
+  name: string;
+  email: string;
+  gender: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
