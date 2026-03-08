@@ -70,8 +70,8 @@
 - [ ] **Verification Approved** (success screen)
 - [ ] **Verification Rejected** (rejection + re-submit screen)
 - [ ] **6-Month Re-verification** (renewal prompt screen)
-- [ ] **Create/Edit Profile** (full form: basic info, religious info, lifestyle, family, preferences, photos)
-- [ ] **Upload Photos** (gallery, blur-until-accepted, private gallery)
+- [x] **Create/Edit Profile** (full 6-step form: basic info, religious info, lifestyle, family background, marriage preferences, photo upload with privacy settings)
+- [x] **Upload Photos** (profile photo + gallery up to 5, blur-until-accepted, private, public privacy modes)
 - [ ] **Nearby Matches** (dedicated location-based page)
 - [ ] **Match Requests** (who liked your profile)
 
@@ -132,20 +132,20 @@
 | Public Pages | 7 | 1 (Contact standalone) |
 | Auth Pages | 6 | 1 (Phone OTP) |
 | Verification Pages | 2 | 5 |
-| Dashboard Pages | 7 | 3 |
+| Dashboard Pages | 9 | 1 |
 | Admin Panel | 0 | 8 |
 | Backend/Database | 0 | 10+ |
 | Anti-Spam | 0 | 5 |
 | SEO | 0 | 5 |
 
-**Frontend UI: ~70% complete**
-**Full-stack with backend: ~30% complete**
+**Frontend UI: ~80% complete**
+**Full-stack with backend: ~35% complete**
 
 ---
 
 ## 🔜 RECOMMENDED NEXT STEPS
 
-1. **Create Profile / Edit Profile form** — largest missing user-facing feature
+1. **Admin Panel** — verification queue, user management, reports, analytics
 2. **Admin Panel** — verification queue, user management, reports
 3. **Enable Lovable Cloud** — database, auth, file storage, edge functions
 4. **Remaining verification screens** — OTP, selfie, approved/rejected/re-verify

@@ -23,6 +23,7 @@ import AuthLayout from "./components/layout/AuthLayout";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import ProfileView from "./pages/dashboard/ProfileView";
+import CreateProfile from "./pages/dashboard/CreateProfile";
 import Interests from "./pages/dashboard/Interests";
 import Favorites from "./pages/dashboard/Favorites";
 import Messages from "./pages/dashboard/Messages";
@@ -62,8 +63,9 @@ const App = () => (
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<ProfileView />} />
-            <Route path="edit-profile" element={<ProfileView />} />
-            <Route path="photos" element={<ProfileView />} />
+            <Route path="create-profile" element={<CreateProfile />} />
+            <Route path="edit-profile" element={<CreateProfile />} />
+            <Route path="photos" element={<CreateProfile />} />
             <Route path="preferences" element={<Settings />} />
             <Route path="search" element={<Search />} />
             <Route path="nearby" element={<Search />} />
