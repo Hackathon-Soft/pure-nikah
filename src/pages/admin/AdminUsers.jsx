@@ -207,6 +207,13 @@ const AdminUsers = () => {
                         </Button>
                         <Button
                           variant="ghost" size="icon"
+                          title={u.in_person_verified ? "Remove in-person verification" : "Mark as in-person verified"}
+                          onClick={() => inPersonMutation.mutate({ userId: u.user_id, inPersonVerified: !u.in_person_verified })}
+                        >
+                          <FiUserCheck className={u.in_person_verified ? "text-blue-600" : "text-muted-foreground"} />
+                        </Button>
+                        <Button
+                          variant="ghost" size="icon"
                           title={u.is_banned ? "Unban user" : "Ban user"}
                           onClick={() => banMutation.mutate({ userId: u.user_id, banned: !u.is_banned })}
                         >

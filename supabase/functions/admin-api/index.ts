@@ -513,6 +513,17 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "in_person_verify_user": {
+        const { userId, inPersonVerified } = params;
+        const { error } = await adminClient
+          .from("profiles")
+          .update({ in_person_verified: inPersonVerified })
+          .eq("user_id", userId);
+        if (error) throw error;
+        result = { success: true, message: inPersonVerified ? "In-person verification granted" : "In-person verification removed" };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
           status: 400,
