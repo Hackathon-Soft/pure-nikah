@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FiCamera, FiUpload, FiTrash2, FiStar, FiShield, FiAlertCircle } from "react-icons/fi";
 import { useState } from "react";
+import { PhotoAccessRequests } from "@/components/photos/PhotoPrivacy";
 
 const initialPhotos = [
   { id: 1, isPrimary: true, uploaded: true },
@@ -18,6 +19,21 @@ const Photos = () => {
 
   return (
     <div className="p-token-4 md:p-token-8 max-w-4xl space-y-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="page-title flex items-center gap-token-2">
+          <FiCamera className="text-primary" /> My Photos
+        </h1>
+        <p className="page-subtitle">Upload up to 6 photos. Your primary photo is shown in search results.</p>
+      </motion.div>
+
+      {/* Photo Access Requests */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}>
+        <Card>
+          <CardContent className="p-token-4">
+            <PhotoAccessRequests />
+          </CardContent>
+        </Card>
+      </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="page-title flex items-center gap-token-2">
           <FiCamera className="text-primary" /> My Photos

@@ -19,6 +19,7 @@ import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 import LimitBanner from "@/components/LimitBanner";
 import { toast } from "sonner";
 import { ProtectedContent } from "@/components/protection/ContentProtection";
+import { ProtectedPhoto } from "@/components/photos/PhotoPrivacy";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
@@ -256,9 +257,15 @@ const FullView = ({
             <CardContent className="p-token-6">
               <div className="flex flex-col sm:flex-row gap-token-6">
                 <div className="relative mx-auto sm:mx-0">
-                  <div className="w-28 h-28 rounded-2xl bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-4xl font-display font-bold">
-                    {profile.name.charAt(0)}
-                  </div>
+                  <ProtectedPhoto
+                    src={profile.photoUrl}
+                    alt={profile.name}
+                    className="w-28 h-28 rounded-2xl"
+                    profileOwnerId={profile.userId}
+                    photoPrivacy={profile.photoPrivacy || "blur_until_accepted"}
+                    fallbackInitial={profile.name.charAt(0)}
+                    showRequestButton={true}
+                  />
                   {profile.verified && (
                     <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary flex items-center justify-center border-2 border-card">
                       <FiCheckCircle className="text-primary-foreground" style={{ fontSize: "var(--text-xs)" }} />
