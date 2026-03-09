@@ -57,7 +57,7 @@ const Messages = () => {
         const otherId = c.user1_id === user.id ? c.user2_id : c.user1_id;
         const { data: profile } = await supabase
           .from("profiles")
-          .select("first_name, last_name, is_verified")
+          .select("first_name, last_name, display_name, is_verified")
           .eq("user_id", otherId)
           .single();
         return { ...c, otherProfile: profile, otherUserId: otherId };
