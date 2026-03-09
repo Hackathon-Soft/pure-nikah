@@ -524,6 +524,75 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "list_notices": {
+        const { data: notices, error } = await adminClient
+          .from("public_notices")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        result = { notices: notices || [] };
+        break;
+      }
+
+      case "create_notice": {
+        const { title, content, type, priority, expires_at } = params;
+        const { data: notice, error } = await adminClient
+          .from("public_notices")
+          .insert({
+            title,
+            content,
+            type: type || "info",
+            priority: priority || 0,
+            expires_at: expires_at || null,
+            created_by: user.id,
+          })
+          .select()
+          .single();
+        if (error) throw error;
+        result = { notice };
+        break;
+      }
+
+      case "update_notice": {
+        const { noticeId, ...updates } = params;
+        const { error } = await adminClient
+          .from("public_notices")
+          .update(updates)
+          .eq("id", noticeId);
+        if (error) throw error;
+        result = { success: true };
+        break;
+      }
+
+      case "delete_notice": {
+        const { noticeId } = params;
+        const { error } = await adminClient
+          .from("public_notices")
+          .delete()
+          .eq("id", noticeId);
+        if (error) throw error;
+        result = { success: true };
+        break;
+      }
+
+      case "get_caste_trends": {
+        const { data: profiles, error } = await adminClient
+          .from("profiles")
+          .select("caste")
+          .not("caste", "is", null);
+        if (error) throw error;
+        const casteCount: Record<string, number> = {};
+        (profiles || []).forEach((p: any) => {
+          if (p.caste) casteCount[p.caste] = (casteCount[p.caste] || 0) + 1;
+        });
+        const casteTrends = Object.entries(casteCount)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+        result = { casteTrends };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
           status: 400,
