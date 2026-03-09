@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight, FiHeart } from "react-icons/fi";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -43,6 +43,21 @@ const AdminUsers = () => {
     },
   });
 
+  const marriedMutation = useMutation({
+    mutationFn: ({ userId, married }) => adminApi("mark_married", { userId, married }),
+    onSuccess: (_, { married }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast({
+        title: married ? "💍 Marked as Married — Mubarak!" : "Marriage status removed",
+        description: married ? "Profile is now closed and removed from search." : "Profile has been reinstated.",
+      });
+    },
+    onError: (err) => {
+      toast({ title: "Failed", description: err.message, variant: "destructive" });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: ({ userId }) => adminApi("delete_user", { userId }),
     onSuccess: () => {
@@ -60,6 +75,7 @@ const AdminUsers = () => {
     { label: "Verified", value: "verified" },
     { label: "Unverified", value: "unverified" },
     { label: "Banned", value: "banned" },
+    { label: "💍 Married", value: "married" },
   ];
 
   return (
@@ -80,7 +96,7 @@ const AdminUsers = () => {
             className="pl-9"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {filters.map((f) => (
             <Button
               key={f.value}
@@ -115,15 +131,23 @@ const AdminUsers = () => {
                 ) : users.length === 0 ? (
                   <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No users found.</td></tr>
                 ) : users.map((u) => (
-                  <tr key={u.id} className="border-b hover:bg-muted/30 transition-colors">
-                    <td className="p-3 font-medium">{u.first_name} {u.last_name}</td>
+                  <tr key={u.id} className={`border-b hover:bg-muted/30 transition-colors ${u.is_married ? "bg-rose-50/50 dark:bg-rose-950/10" : ""}`}>
+                    <td className="p-3 font-medium">
+                      {u.first_name} {u.last_name}
+                      {u.is_married && <span className="ml-1 text-rose-500" title="Married via Platform">💍</span>}
+                    </td>
                     <td className="p-3 text-muted-foreground">{u.email}</td>
                     <td className="p-3 text-muted-foreground">{u.city || "—"}</td>
                     <td className="p-3">
                       <div className="flex gap-1 flex-wrap">
-                        {u.is_verified && <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Verified</Badge>}
+                        {u.is_married && (
+                          <Badge className="bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300">
+                            💍 Married
+                          </Badge>
+                        )}
+                        {u.is_verified && !u.is_married && <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Verified</Badge>}
                         {u.is_banned && <Badge variant="destructive">Banned</Badge>}
-                        {!u.is_verified && !u.is_banned && <Badge variant="secondary">Unverified</Badge>}
+                        {!u.is_verified && !u.is_banned && !u.is_married && <Badge variant="secondary">Unverified</Badge>}
                       </div>
                     </td>
                     <td className="p-3 text-muted-foreground text-xs">
@@ -131,6 +155,40 @@ const AdminUsers = () => {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center justify-end gap-1">
+                        {/* Mark Married */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost" size="icon"
+                              title={u.is_married ? "Remove married status" : "Mark as married via platform"}
+                            >
+                              <FiHeart className={u.is_married ? "text-rose-500 fill-rose-500" : "text-muted-foreground"} />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                {u.is_married ? "Remove Married Status?" : `Mark ${u.first_name} as Married?`}
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {u.is_married
+                                  ? `This will reinstate ${u.first_name}'s profile and make it visible in search again.`
+                                  : `This will mark ${u.first_name} ${u.last_name} as married via PureNikah. Their profile will be removed from search and their dashboard access will be restricted. Alhamdulillah!`
+                                }
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => marriedMutation.mutate({ userId: u.user_id, married: !u.is_married })}
+                                className={u.is_married ? "" : "bg-rose-500 hover:bg-rose-600"}
+                              >
+                                {u.is_married ? "Remove Status" : "💍 Confirm Nikah"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+
                         <Button
                           variant="ghost" size="icon"
                           title={u.is_verified ? "Remove verification" : "Verify user"}

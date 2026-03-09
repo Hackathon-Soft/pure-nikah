@@ -32,14 +32,15 @@ const SearchPage = () => {
   const [cityFilter, setCityFilter] = useState("any");
   const [searchText, setSearchText] = useState("");
 
-  // Fetch profiles from database
+  // Fetch profiles from database — exclude married users
   const { data: dbProfiles = [], isLoading } = useQuery({
     queryKey: ["search-profiles"],
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
         .select("*")
-        .eq("profile_completed", true);
+        .eq("profile_completed", true)
+        .or("is_married.is.null,is_married.eq.false");
       return data || [];
     },
   });
