@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight, FiHeart } from "react-icons/fi";
+import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight, FiHeart, FiUserCheck } from "react-icons/fi";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
