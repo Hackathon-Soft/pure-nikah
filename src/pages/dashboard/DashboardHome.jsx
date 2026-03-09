@@ -324,39 +324,40 @@ const DashboardHome = () => {
           </Card>
         </motion.div>
 
-        {/* Suggested Matches */}
+        {/* Personalized Recommendations */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           <Card className="h-full">
             <CardContent className="p-token-6">
               <div className="flex items-center justify-between mb-token-4">
-                <h3 className="font-display text-token-lg font-semibold text-foreground">Suggested Matches</h3>
-                <Link to="/dashboard/search" className="text-token-xs text-primary font-medium hover:underline">Search More</Link>
+                <h3 className="font-display text-token-lg font-semibold text-foreground">🤖 Personalized Matches</h3>
+                <Link to="/dashboard/search" className="text-token-xs text-primary font-medium hover:underline">View All</Link>
               </div>
               <div className="space-y-token-3">
                 {suggestedMatches.length === 0 ? (
                   <p className="text-token-sm text-muted-foreground text-center py-token-4">
-                    No matches yet. More users are joining every day!
+                    Complete your profile to get AI-curated match recommendations!
                   </p>
                 ) : (
                   suggestedMatches.map((match) => (
-                    <div key={match.id} className="flex items-center gap-token-3 p-token-3 rounded-lg bg-muted">
+                    <Link key={match.id} to={`/profile/${match.user_id}`} className="flex items-center gap-token-3 p-token-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
                       <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-accent-foreground text-token-sm font-bold flex-shrink-0">
-                        {match.first_name?.charAt(0) || "?"}
+                        {getDisplayName(match).charAt(0)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">
-                          {match.first_name} {match.last_name?.charAt(0)}.
+                          {getDisplayName(match)}
                           {match.is_verified && <FiShield className="text-primary text-xs" />}
                         </p>
-                        <p className="text-token-xs text-muted-foreground">{match.city || "Unknown"}</p>
+                        <p className="text-token-xs text-muted-foreground">{match.city || "Unknown"}{match.profession ? ` • ${match.profession}` : ""}</p>
                       </div>
-                    </div>
+                      <CompatibilityBadge score={match.compatibility} size="sm" />
+                    </Link>
                   ))
                 )}
               </div>
               <Button variant="hero" size="sm" asChild className="w-full mt-token-4">
                 <Link to="/dashboard/search">
-                  <FiSearch className="mr-1 text-sm" /> Find Matches
+                  <FiSearch className="mr-1 text-sm" /> Find More Matches
                 </Link>
               </Button>
             </CardContent>
