@@ -31,6 +31,13 @@ import TermsOfService from "./pages/TermsOfService";
 import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 import ProfileDetail from "./pages/ProfileDetail";
+import Contact from "./pages/Contact";
+
+// Verification status pages
+import VerificationPending from "./pages/VerificationPending";
+import VerificationApproved from "./pages/VerificationApproved";
+import VerificationRejected from "./pages/VerificationRejected";
+import VerificationReVerify from "./pages/VerificationReVerify";
 
 // Dashboard pages — lazy loaded
 const DashboardHome     = lazy(() => import("./pages/dashboard/DashboardHome"));
@@ -46,11 +53,12 @@ const Photos            = lazy(() => import("./pages/dashboard/Photos"));
 const BlockedUsers      = lazy(() => import("./pages/dashboard/BlockedUsers"));
 
 // Admin pages — lazy loaded
-const AdminDashboard    = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminUsers        = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminVerification = lazy(() => import("./pages/admin/AdminVerification"));
-const AdminReports      = lazy(() => import("./pages/admin/AdminReports"));
-const AdminSettings     = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminDashboard      = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers          = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminVerification   = lazy(() => import("./pages/admin/AdminVerification"));
+const AdminReports        = lazy(() => import("./pages/admin/AdminReports"));
+const AdminSettings       = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminSuccessStories = lazy(() => import("./pages/admin/AdminSuccessStories"));
 
 // Fallback spinner shown while lazy chunks load
 const PageLoader = () => (
@@ -76,6 +84,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/search" element={<Search />} />
               <Route path="/profile/:id" element={<ProfileDetail />} />
+              <Route path="/contact" element={<Contact />} />
             </Route>
 
             {/* Auth pages with minimal layout */}
@@ -89,6 +98,12 @@ const App = () => (
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/help" element={<HelpCenter />} />
             </Route>
+
+            {/* Verification status screens (standalone) */}
+            <Route path="/verification/pending" element={<VerificationPending />} />
+            <Route path="/verification/approved" element={<VerificationApproved />} />
+            <Route path="/verification/rejected" element={<VerificationRejected />} />
+            <Route path="/verification/re-verify" element={<VerificationReVerify />} />
 
             {/* Dashboard with sidebar layout — PROTECTED + LAZY */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -115,6 +130,7 @@ const App = () => (
               <Route index element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
               <Route path="users" element={<Suspense fallback={<PageLoader />}><AdminUsers /></Suspense>} />
               <Route path="verification" element={<Suspense fallback={<PageLoader />}><AdminVerification /></Suspense>} />
+              <Route path="success-stories" element={<Suspense fallback={<PageLoader />}><AdminSuccessStories /></Suspense>} />
               <Route path="reports" element={<Suspense fallback={<PageLoader />}><AdminReports /></Suspense>} />
               <Route path="settings" element={<Suspense fallback={<PageLoader />}><AdminSettings /></Suspense>} />
             </Route>

@@ -1,25 +1,41 @@
 import { useCallback, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
 import { RiDoubleQuotesL } from "react-icons/ri";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useEmblaCarousel from "embla-carousel-react";
 
-const stories = [
-  { name: "Ahmed & Fatima", location: "London, UK", text: "Alhamdulillah, we found each other on PureNikah. The halal environment gave us both peace of mind. We've been married for 2 years now!" },
-  { name: "Yusuf & Aisha", location: "Toronto, Canada", text: "The wali system was a game-changer for my family. My father was able to be part of the process, which made everything so comfortable." },
-  { name: "Omar & Khadija", location: "Dubai, UAE", text: "What sets PureNikah apart is the focus on genuine intentions. Every profile is verified and the community is sincere. MashaAllah!" },
-  { name: "Ibrahim & Maryam", location: "Karachi, Pakistan", text: "I had almost given up hope, but Alhamdulillah PureNikah connected me with the most amazing person. We got married within 3 months!" },
-  { name: "Bilal & Zainab", location: "Birmingham, UK", text: "The Islamic values embedded in the platform made us both comfortable. Our families were involved from day one. Truly a blessed experience." },
+const staticStories = [
+  { couple_names: "Ahmed & Fatima", location: "London, UK", review: "Alhamdulillah, we found each other on PureNikah. The halal environment gave us both peace of mind. We've been married for 2 years now!", rating: 5 },
+  { couple_names: "Yusuf & Aisha", location: "Toronto, Canada", review: "The wali system was a game-changer for my family. My father was able to be part of the process, which made everything so comfortable.", rating: 5 },
+  { couple_names: "Omar & Khadija", location: "Dubai, UAE", review: "What sets PureNikah apart is the focus on genuine intentions. Every profile is verified and the community is sincere. MashaAllah!", rating: 5 },
+  { couple_names: "Ibrahim & Maryam", location: "Karachi, Pakistan", review: "I had almost given up hope, but Alhamdulillah PureNikah connected me with the most amazing person. We got married within 3 months!", rating: 5 },
+  { couple_names: "Bilal & Zainab", location: "Birmingham, UK", review: "The Islamic values embedded in the platform made us both comfortable. Our families were involved from day one. Truly a blessed experience.", rating: 5 },
 ];
 
 const SuccessStories = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
 
+  const { data: dbStories } = useQuery({
+    queryKey: ["success-stories-public"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("success_stories")
+        .select("*")
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const stories = (dbStories && dbStories.length > 0) ? dbStories : staticStories;
+
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
-  // Auto-play every 4 seconds
   useEffect(() => {
     if (!emblaApi) return;
     const interval = setInterval(() => emblaApi.scrollNext(), 4000);
@@ -41,12 +57,11 @@ const SuccessStories = () => {
         </motion.div>
 
         <div className="relative max-w-5xl mx-auto">
-          {/* Carousel */}
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex">
-              {stories.map((story) => (
+              {stories.map((story, index) => (
                 <div
-                  key={story.name}
+                  key={story.id || `static-${index}`}
                   className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] px-3"
                 >
                   <div className="rounded-2xl bg-background border border-border p-token-8 shadow-card relative h-full">
@@ -55,16 +70,16 @@ const SuccessStories = () => {
                       style={{ fontSize: "var(--size-icon-xl)" }}
                     />
                     <div className="flex gap-token-1 mb-token-4">
-                      {[...Array(5)].map((_, j) => (
+                      {[...Array(story.rating || 5)].map((_, j) => (
                         <FaStar key={j} className="text-accent" style={{ fontSize: "var(--size-icon)" }} />
                       ))}
                     </div>
                     <p className="text-muted-foreground text-token-sm leading-token-relaxed mb-token-6">
-                      "{story.text}"
+                      "{story.review}"
                     </p>
                     <div>
-                      <p className="font-display font-semibold text-foreground">{story.name}</p>
-                      <p className="text-token-xs text-muted-foreground">{story.location}</p>
+                      <p className="font-display font-semibold text-foreground">{story.couple_names}</p>
+                      <p className="text-token-xs text-muted-foreground">{story.location || "—"}</p>
                     </div>
                   </div>
                 </div>
@@ -72,7 +87,6 @@ const SuccessStories = () => {
             </div>
           </div>
 
-          {/* Navigation Buttons */}
           <button
             onClick={scrollPrev}
             className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-card flex items-center justify-center text-foreground hover:bg-muted transition-colors z-10"
