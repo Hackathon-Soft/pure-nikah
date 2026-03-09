@@ -27,7 +27,7 @@ const basicInfoSchema = yup.object({
   height: yup.string().min(1, "Height is required").required("Height is required"),
   city: yup.string().min(2, "City is required").required("City is required"),
   country: yup.string().min(2, "Country is required").required("Country is required"),
-  maritalStatus: yup.string().oneOf(["never_married", "divorced", "widowed"], "Marital status is required").required("Marital status is required"),
+  maritalStatus: yup.string().oneOf(["never_married", "divorced", "widowed", "separated"], "Marital status is required").required("Marital status is required"),
   bio: yup.string().max(500, "Bio must be 500 characters or less").optional(),
 });
 
