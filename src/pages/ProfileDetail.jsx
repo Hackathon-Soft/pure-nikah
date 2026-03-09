@@ -348,10 +348,29 @@ const FullView = ({ profile, score }) => {
 // ─── Main Page Component ───
 const ProfileDetail = () => {
   const { id } = useParams();
-  const { isLoggedIn } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const viewRecorded = useRef(false);
+
+  const { data: settings = {} } = usePlatformSettings();
+  const { viewCount, refetchViews } = useDailyUsage();
 
   const profile = mockProfilesDB[Number(id)];
+
+  const viewLimit = settings.daily_profile_views_limit ?? 0;
+  const limitReached = isAuthenticated && viewLimit > 0 && viewCount >= viewLimit;
+
+  // Record profile view once per mount (only for logged-in users)
+  useEffect(() => {
+    if (!isAuthenticated || !user || !profile || viewRecorded.current) return;
+    if (limitReached) return; // don't record if already over limit
+
+    viewRecorded.current = true;
+    supabase.from("profile_views").insert({
+      viewer_id: user.id,
+      viewed_id: String(id), // mock profile id used as placeholder
+    }).then(() => refetchViews());
+  }, [isAuthenticated, user, profile, id, limitReached, refetchViews]);
 
   if (!profile) {
     return (
@@ -365,6 +384,39 @@ const ProfileDetail = () => {
     );
   }
 
+  // Block view if daily limit exceeded
+  if (limitReached) {
+    return (
+      <div className="min-h-screen bg-muted islamic-pattern flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="max-w-md w-full text-center shadow-elevated">
+            <CardContent className="p-8 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+                <FiAlertTriangle className="text-destructive text-2xl" />
+              </div>
+              <h2 className="font-display text-xl font-bold text-foreground">Daily View Limit Reached</h2>
+              <p className="text-sm text-muted-foreground">
+                You've viewed <strong>{viewCount}</strong> profiles today (limit: {viewLimit}).
+                Your limit resets at midnight. Come back tomorrow to keep browsing!
+              </p>
+              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                <div className="h-full bg-destructive rounded-full w-full" />
+              </div>
+              <div className="flex gap-3 justify-center pt-2">
+                <Button variant="outline" onClick={() => navigate(-1)}>
+                  <FiArrowLeft className="mr-2" /> Go Back
+                </Button>
+                <Button variant="hero" asChild>
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
   const candidateData = {
     age: profile.age, city: profile.city, sect: profile.sect?.split(" ")[0],
     cast: profile.cast, education: profile.education?.split(" ")[0],
@@ -373,7 +425,7 @@ const ProfileDetail = () => {
   };
   const score = calculateCompatibility(myPreferences, candidateData);
 
-  if (isLoggedIn) {
+  if (isAuthenticated) {
     return <FullView profile={profile} score={score} />;
   }
   return <QuickView profile={profile} score={score} />;
