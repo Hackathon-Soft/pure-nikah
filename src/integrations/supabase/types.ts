@@ -696,6 +696,44 @@ export type Database = {
         }
         Relationships: []
       }
+      wali_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          invited_by: string
+          status: string
+          wali_email: string
+          wali_user_id: string | null
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          invited_by: string
+          status?: string
+          wali_email: string
+          wali_user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string
+          status?: string
+          wali_email?: string
+          wali_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
