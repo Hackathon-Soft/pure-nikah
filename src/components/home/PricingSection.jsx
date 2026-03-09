@@ -61,31 +61,30 @@ const specialDiscounts = [
 const PricingSection = () => (
   <section className="section-padding bg-muted islamic-pattern" id="pricing">
     <div className="app-container">
-      {/* Main Plans */}
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="section-header">
         <span className="section-label">Pricing</span>
         <h2 className="section-title">100% Free. No Hidden Fees.</h2>
         <p className="section-subtitle max-w-lg">PureNikah is built as a community service. All features are free. We only ask for optional donations to keep the platform running.</p>
       </motion.div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-token-6 max-w-3xl mx-auto">
+      <div className="grid-2col max-w-3xl mx-auto">
         {plans.map((plan, i) => (
           <motion.div key={plan.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-            className={`relative rounded-2xl bg-card border p-token-8 flex flex-col ${plan.highlight ? "border-primary shadow-elevated" : "border-border shadow-card"}`}>
+            className={plan.highlight ? "card-pricing-highlight" : "card-pricing-default"}>
             {plan.highlight && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 badge-sm bg-gradient-primary text-primary-foreground font-semibold px-token-4 flex items-center gap-token-1">
+              <div className="badge-recommended">
                 <FiHeart style={{ fontSize: "var(--text-xs)" }} /> Recommended
               </div>
             )}
             <h3 className="card-section-title text-token-xl">{plan.name}</h3>
             <div className="mt-token-3 mb-token-2">
-              <span className="text-token-4xl font-bold text-foreground">{plan.price}</span>
-              {plan.period && <span className="text-muted-foreground text-token-sm ml-token-1">{plan.period}</span>}
+              <span className="pricing-price">{plan.price}</span>
+              {plan.period && <span className="pricing-period">{plan.period}</span>}
             </div>
-            <p className="text-token-sm text-muted-foreground mb-token-6">{plan.description}</p>
-            <ul className="flex-1 space-y-3 mb-token-8">
+            <p className="pricing-description">{plan.description}</p>
+            <ul className="pricing-features">
               {plan.features.map((f) => (
-                <li key={f} className="flex items-start gap-token-2 text-token-sm text-muted-foreground">
-                  <FiCheck className="text-primary flex-shrink-0 mt-0.5" style={{ fontSize: "var(--size-icon)" }} />
+                <li key={f} className="check-list-item">
+                  <FiCheck className="check-list-item-icon" style={{ fontSize: "var(--size-icon)" }} />
                   {f}
                 </li>
               ))}
@@ -97,7 +96,6 @@ const PricingSection = () => (
         ))}
       </div>
 
-      {/* Special Discounts Section */}
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-token-16">
         <div className="section-header">
           <span className="section-label">Special Support</span>
@@ -107,7 +105,7 @@ const PricingSection = () => (
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-token-6 max-w-4xl mx-auto">
+        <div className="grid-2col max-w-4xl mx-auto">
           {specialDiscounts.map((discount, i) => (
             <motion.div
               key={discount.title}
@@ -118,26 +116,22 @@ const PricingSection = () => (
             >
               <Card className={`${discount.color} ${discount.bg} h-full`}>
                 <CardContent className="p-token-8 flex flex-col h-full">
-                  {/* Header */}
-                  <div className="flex items-center gap-token-3 mb-token-4">
-                    <span className="text-token-3xl">{discount.icon}</span>
+                  <div className="discount-card-header">
+                    <span className="discount-card-icon">{discount.icon}</span>
                     <div>
-                      <h3 className="font-display text-token-xl font-bold text-foreground">{discount.title}</h3>
-                      <span className={`inline-block text-token-xs font-semibold ${discount.badgeBg} ${discount.badgeText} px-token-2 py-0.5 rounded-full mt-token-1`}>
+                      <h3 className="discount-card-title">{discount.title}</h3>
+                      <span className={`discount-card-badge ${discount.badgeBg} ${discount.badgeText}`}>
                         {discount.subtitle}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-token-sm text-muted-foreground mb-token-6 leading-token-relaxed">
-                    {discount.description}
-                  </p>
+                  <p className="text-body-muted mb-token-6">{discount.description}</p>
 
-                  {/* Benefits */}
-                  <ul className="flex-1 space-y-3 mb-token-6">
+                  <ul className="pricing-features">
                     {discount.benefits.map((benefit) => (
-                      <li key={benefit} className="flex items-start gap-token-2 text-token-sm text-foreground">
-                        <FiCheck className="text-primary flex-shrink-0 mt-0.5" style={{ fontSize: "var(--size-icon)" }} />
+                      <li key={benefit} className="check-list-item text-foreground">
+                        <FiCheck className="check-list-item-icon" style={{ fontSize: "var(--size-icon)" }} />
                         {benefit}
                       </li>
                     ))}
@@ -152,7 +146,6 @@ const PricingSection = () => (
           ))}
         </div>
 
-        {/* Islamic Quote */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -161,10 +154,8 @@ const PricingSection = () => (
         >
           <Card className="bg-card border-border">
             <CardContent className="p-token-6">
-              <p className="text-token-sm text-muted-foreground italic leading-token-relaxed">
-                "The best of you are those who are best to the widows and the poor."
-              </p>
-              <p className="text-token-xs text-primary font-semibold mt-token-2">— Prophet Muhammad ﷺ (Sahih Bukhari)</p>
+              <p className="quote-text">"The best of you are those who are best to the widows and the poor."</p>
+              <p className="quote-attribution">— Prophet Muhammad ﷺ (Sahih Bukhari)</p>
             </CardContent>
           </Card>
         </motion.div>

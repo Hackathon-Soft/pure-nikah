@@ -64,7 +64,7 @@ const SuccessStories = () => {
                   key={story.id || `static-${index}`}
                   className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] px-3"
                 >
-                  <div className="rounded-2xl bg-background border border-border p-token-8 shadow-card relative h-full">
+                  <div className="card-testimonial">
                     <RiDoubleQuotesL
                       className="absolute top-6 right-6 text-primary/15"
                       style={{ fontSize: "var(--size-icon-xl)" }}
@@ -74,12 +74,10 @@ const SuccessStories = () => {
                         <FaStar key={j} className="text-accent" style={{ fontSize: "var(--size-icon)" }} />
                       ))}
                     </div>
-                    <p className="text-muted-foreground text-token-sm leading-token-relaxed mb-token-6">
-                      "{story.review}"
-                    </p>
+                    <p className="text-body-muted mb-token-6">"{story.review}"</p>
                     <div>
                       <p className="font-display font-semibold text-foreground">{story.couple_names}</p>
-                      <p className="text-token-xs text-muted-foreground">{story.location || "—"}</p>
+                      <p className="text-body-muted-xs">{story.location || "—"}</p>
                     </div>
                   </div>
                 </div>
@@ -87,18 +85,10 @@ const SuccessStories = () => {
             </div>
           </div>
 
-          <button
-            onClick={scrollPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-card flex items-center justify-center text-foreground hover:bg-muted transition-colors z-10"
-            aria-label="Previous"
-          >
+          <button onClick={scrollPrev} className="carousel-nav-prev" aria-label="Previous">
             <FiChevronLeft style={{ fontSize: "var(--size-icon)" }} />
           </button>
-          <button
-            onClick={scrollNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-card flex items-center justify-center text-foreground hover:bg-muted transition-colors z-10"
-            aria-label="Next"
-          >
+          <button onClick={scrollNext} className="carousel-nav-next" aria-label="Next">
             <FiChevronRight style={{ fontSize: "var(--size-icon)" }} />
           </button>
         </div>

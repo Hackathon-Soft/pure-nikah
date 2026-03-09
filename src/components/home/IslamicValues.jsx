@@ -17,15 +17,15 @@ const IslamicValues = () => (
         <h2 className="section-title">Built on Islamic Values</h2>
         <p className="section-subtitle max-w-lg">"And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them." — Quran 30:21</p>
       </motion.div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-token-6 max-w-4xl mx-auto">
+      <div className="grid-2col max-w-4xl mx-auto">
         {values.map((val, i) => (
-          <motion.div key={val.title} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="flex gap-token-4 p-token-6 card-base hover:shadow-elevated transition-shadow">
+          <motion.div key={val.title} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="card-feature">
             <div className="icon-box w-12 h-12">
               <val.icon className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} />
             </div>
             <div>
               <h3 className="card-section-title mb-token-1">{val.title}</h3>
-              <p className="text-token-sm text-muted-foreground leading-token-relaxed">{val.description}</p>
+              <p className="text-body-muted">{val.description}</p>
             </div>
           </motion.div>
         ))}

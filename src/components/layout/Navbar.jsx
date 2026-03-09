@@ -26,14 +26,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-sticky bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="app-container flex items-center justify-between h-navbar">
-        <Link to="/" className="flex items-center gap-token-2">
+    <nav className="navbar">
+      <div className="navbar-inner">
+        <Link to="/" className="navbar-brand">
           <FaHeart className="text-primary" style={{ fontSize: "var(--size-icon-lg)" }} />
-          <span className="font-display text-token-xl font-bold text-foreground">PureNikah</span>
+          <span className="navbar-brand-text">PureNikah</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-token-8">
+        <div className="navbar-links">
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -45,7 +45,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-token-3">
+        <div className="navbar-actions">
           {isAuthenticated ? (
             <>
               <Button variant="ghost" asChild>
@@ -67,7 +67,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+        <button className="navbar-mobile-toggle" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? (
             <HiX style={{ fontSize: "var(--size-icon-lg)" }} />
           ) : (
@@ -82,9 +82,9 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background border-b border-border overflow-hidden"
+            className="navbar-mobile-menu"
           >
-            <div className="flex flex-col p-token-4 gap-token-3">
+            <div className="navbar-mobile-inner">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -95,7 +95,7 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              <div className="flex gap-token-3 mt-token-2">
+              <div className="navbar-mobile-actions">
                 {isAuthenticated ? (
                   <>
                     <Button variant="outline" asChild className="flex-1">
