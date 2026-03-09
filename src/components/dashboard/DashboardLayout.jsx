@@ -5,6 +5,31 @@ import { FiBell, FiLogOut } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
+const MarriedRestrictionScreen = ({ onSignOut }) => (
+  <div className="min-h-screen bg-muted islamic-pattern flex items-center justify-center p-6">
+    <div className="max-w-md w-full text-center space-y-6">
+      <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto text-4xl">
+        💍
+      </div>
+      <div>
+        <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+          Mubarak! Profile Closed
+        </h1>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Your profile has been marked as <span className="font-semibold text-primary">Married via PureNikah</span> by the administrator. Alhamdulillah! Your account is now closed as you have found your life partner.
+        </p>
+      </div>
+      <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm text-muted-foreground">
+        <p>If you believe this is a mistake, please contact our support team at <span className="text-primary font-medium">support@purenikah.com</span></p>
+      </div>
+      <Button variant="outline" onClick={onSignOut} className="w-full">
+        <FiLogOut className="mr-2" />
+        Sign Out
+      </Button>
+    </div>
+  </div>
+);
+
 const DashboardLayout = () => {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
@@ -13,6 +38,11 @@ const DashboardLayout = () => {
     await signOut();
     navigate("/");
   };
+
+  // Block access for married users
+  if (profile?.is_married) {
+    return <MarriedRestrictionScreen onSignOut={handleSignOut} />;
+  }
 
   const initial = profile?.first_name?.charAt(0)?.toUpperCase() || "U";
 
