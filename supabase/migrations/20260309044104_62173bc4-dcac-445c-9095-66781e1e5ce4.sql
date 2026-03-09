@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN in_person_verified boolean DEFAULT false;

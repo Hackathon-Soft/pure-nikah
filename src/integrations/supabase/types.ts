@@ -334,6 +334,7 @@ export type Database = {
           height: string | null
           hijab_beard: string | null
           id: string
+          in_person_verified: boolean | null
           income_range: string | null
           is_banned: boolean | null
           is_married: boolean | null
@@ -391,6 +392,7 @@ export type Database = {
           height?: string | null
           hijab_beard?: string | null
           id?: string
+          in_person_verified?: boolean | null
           income_range?: string | null
           is_banned?: boolean | null
           is_married?: boolean | null
@@ -448,6 +450,7 @@ export type Database = {
           height?: string | null
           hijab_beard?: string | null
           id?: string
+          in_person_verified?: boolean | null
           income_range?: string | null
           is_banned?: boolean | null
           is_married?: boolean | null

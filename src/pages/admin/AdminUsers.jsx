@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight, FiHeart } from "react-icons/fi";
+import { FiSearch, FiSlash, FiCheckCircle, FiTrash2, FiChevronLeft, FiChevronRight, FiHeart, FiUserCheck } from "react-icons/fi";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -55,6 +55,14 @@ const AdminUsers = () => {
     },
     onError: (err) => {
       toast({ title: "Failed", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const inPersonMutation = useMutation({
+    mutationFn: ({ userId, inPersonVerified }) => adminApi("in_person_verify_user", { userId, inPersonVerified }),
+    onSuccess: (_, { inPersonVerified }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: inPersonVerified ? "In-person verified ✓" : "In-person verification removed" });
     },
   });
 
@@ -146,6 +154,7 @@ const AdminUsers = () => {
                           </Badge>
                         )}
                         {u.is_verified && !u.is_married && <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Verified</Badge>}
+                        {u.in_person_verified && <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">In-Person ✓</Badge>}
                         {u.is_banned && <Badge variant="destructive">Banned</Badge>}
                         {!u.is_verified && !u.is_banned && !u.is_married && <Badge variant="secondary">Unverified</Badge>}
                       </div>
@@ -195,6 +204,13 @@ const AdminUsers = () => {
                           onClick={() => verifyMutation.mutate({ userId: u.user_id, verified: !u.is_verified })}
                         >
                           <FiCheckCircle className={u.is_verified ? "text-green-600" : "text-muted-foreground"} />
+                        </Button>
+                        <Button
+                          variant="ghost" size="icon"
+                          title={u.in_person_verified ? "Remove in-person verification" : "Mark as in-person verified"}
+                          onClick={() => inPersonMutation.mutate({ userId: u.user_id, inPersonVerified: !u.in_person_verified })}
+                        >
+                          <FiUserCheck className={u.in_person_verified ? "text-blue-600" : "text-muted-foreground"} />
                         </Button>
                         <Button
                           variant="ghost" size="icon"
