@@ -73,17 +73,46 @@ const DashboardHome = () => {
   });
 
   const { data: suggestedMatches = [] } = useQuery({
-    queryKey: ["suggested-matches", user?.id],
+    queryKey: ["suggested-matches", user?.id, profile?.id],
     queryFn: async () => {
+      const oppositeGender = profile?.gender === "male" ? "female" : "male";
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .neq("user_id", user.id)
         .eq("profile_completed", true)
-        .limit(3);
-      return data || [];
+        .eq("gender", oppositeGender)
+        .limit(20);
+
+      if (!data || !profile) return [];
+
+      const myPrefs = {
+        ageMin: profile.preferred_age_min || 18,
+        ageMax: profile.preferred_age_max || 45,
+        city: profile.city || "",
+        sect: profile.sect || "",
+        cast: profile.caste || "Any",
+        education: profile.education || "",
+        religiosity: profile.religious_practice || "",
+        maritalStatus: profile.marital_status || "Any",
+        preferVerified: true,
+      };
+
+      const getAge = (dob) => dob ? Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000) : 25;
+
+      return data
+        .map((p) => ({
+          ...p,
+          compatibility: calculateCompatibility(myPrefs, {
+            sect: p.sect, cast: p.caste, city: p.city, education: p.education,
+            age: getAge(p.date_of_birth), maritalStatus: p.marital_status,
+            religiosity: p.religious_practice,
+          }),
+        }))
+        .sort((a, b) => b.compatibility - a.compatibility)
+        .slice(0, 5);
     },
-    enabled: !!user,
+    enabled: !!user && !!profile,
   });
 
   const completionFields = profile
