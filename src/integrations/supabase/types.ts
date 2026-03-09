@@ -259,6 +259,7 @@ export type Database = {
           id: string
           income_range: string | null
           is_banned: boolean | null
+          is_married: boolean | null
           is_verified: boolean | null
           islamic_values: string | null
           languages: string[] | null
@@ -306,6 +307,7 @@ export type Database = {
           id?: string
           income_range?: string | null
           is_banned?: boolean | null
+          is_married?: boolean | null
           is_verified?: boolean | null
           islamic_values?: string | null
           languages?: string[] | null
@@ -353,6 +355,7 @@ export type Database = {
           id?: string
           income_range?: string | null
           is_banned?: boolean | null
+          is_married?: boolean | null
           is_verified?: boolean | null
           islamic_values?: string | null
           languages?: string[] | null
