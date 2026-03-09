@@ -113,24 +113,24 @@ const DashboardHome = () => {
   ];
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-6xl">
+    <div className="p-token-4 md:p-token-8 space-y-token-6 max-w-6xl">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
+        <h1 className="text-token-2xl md:text-token-3xl font-display font-bold text-foreground">
           Assalamu Alaikum, {displayName} 👋
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Here's your activity overview.</p>
+        <p className="text-token-sm text-muted-foreground mt-token-1">Here's your activity overview.</p>
       </motion.div>
 
       {/* Complete Profile Banner */}
       {!profile?.profile_completed && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <Card className="border-accent bg-accent/10">
-            <CardContent className="p-4 flex items-center gap-4 flex-wrap">
+            <CardContent className="p-token-4 flex items-center gap-token-4 flex-wrap">
               <FiClock className="text-accent-foreground flex-shrink-0 text-xl" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Complete Your Profile</p>
-                <p className="text-xs text-muted-foreground">Complete your profile to start receiving matches and interests.</p>
+                <p className="text-token-sm font-medium text-foreground">Complete Your Profile</p>
+                <p className="text-token-xs text-muted-foreground">Complete your profile to start receiving matches and interests.</p>
               </div>
               <Button variant="gold" size="sm" asChild>
                 <Link to="/dashboard/create-profile">
@@ -147,17 +147,17 @@ const DashboardHome = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-token-4"
       >
         {stats.map((stat) => (
           <Card key={stat.label}>
-            <CardContent className="p-4 flex items-center gap-3">
+            <CardContent className="p-token-4 flex items-center gap-token-3">
               <div className={`w-10 h-10 rounded-lg bg-muted flex items-center justify-center ${stat.color}`}>
                 <stat.icon className="text-lg" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className="text-token-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-token-xs text-muted-foreground">{stat.label}</p>
               </div>
             </CardContent>
           </Card>
@@ -167,17 +167,17 @@ const DashboardHome = () => {
       {/* Daily Usage Summary */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
         <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
+          <CardContent className="p-token-5">
+            <div className="flex items-center justify-between mb-token-4">
+              <div className="flex items-center gap-token-2">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <FiZap className="text-primary text-sm" />
                 </div>
-                <h3 className="font-display text-base font-semibold text-foreground">Today's Activity</h3>
+                <h3 className="font-display text-token-base font-semibold text-foreground">Today's Activity</h3>
               </div>
-              <span className="text-xs text-muted-foreground">Resets at midnight</span>
+              <span className="text-token-xs text-muted-foreground">Resets at midnight</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-token-4">
               {[
                 { icon: FiMessageSquare, label: "Messages Sent", used: msgCount, limit: settings.daily_messages_limit ?? 0, color: "text-blue-500", to: "/dashboard/messages" },
                 { icon: FiEye,           label: "Profiles Viewed", used: viewCount, limit: settings.daily_profile_views_limit ?? 0, color: "text-purple-500", to: "/dashboard/search" },
@@ -189,16 +189,16 @@ const DashboardHome = () => {
                 const exceeded = !unlimited && used >= limit;
                 const nearLimit = !unlimited && pct >= 80;
                 return (
-                  <Link key={label} to={to} className="group rounded-xl border border-border bg-muted/40 hover:bg-muted transition-colors p-3 flex flex-col gap-2">
+                  <Link key={label} to={to} className="group rounded-xl border border-border bg-muted/40 hover:bg-muted transition-colors p-token-3 flex flex-col gap-token-2">
                     <div className="flex items-center justify-between">
                       <Icon className={`text-sm ${color}`} />
                       {unlimited
-                        ? <span className="text-xs text-muted-foreground font-bold" title="Unlimited">∞</span>
-                        : <span className={`text-xs font-semibold ${exceeded ? "text-destructive" : nearLimit ? "text-amber-500" : "text-muted-foreground"}`}>
+                        ? <span className="text-token-xs text-muted-foreground font-bold" title="Unlimited">∞</span>
+                        : <span className={`text-token-xs font-semibold ${exceeded ? "text-destructive" : nearLimit ? "text-amber-500" : "text-muted-foreground"}`}>
                             {used}/{limit}
                           </span>}
                     </div>
-                    <p className="text-xs text-muted-foreground leading-snug">{label}</p>
+                    <p className="text-token-xs text-muted-foreground leading-token-snug">{label}</p>
                     {unlimited ? (
                       <div className="h-1.5 rounded-full bg-border" />
                     ) : (
@@ -210,7 +210,7 @@ const DashboardHome = () => {
                       </div>
                     )}
                     {exceeded && (
-                      <p className="text-xs font-medium text-destructive">Limit reached</p>
+                      <p className="text-token-xs font-medium text-destructive">Limit reached</p>
                     )}
                   </Link>
                 );
@@ -221,19 +221,19 @@ const DashboardHome = () => {
       </motion.div>
 
       {/* Three Column Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-token-6">
         {/* Profile Completion */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
           <Card className="h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-lg font-semibold text-foreground">Profile</h3>
-                <span className="text-sm font-bold text-primary">{profileCompletion}%</span>
+            <CardContent className="p-token-6">
+              <div className="flex items-center justify-between mb-token-4">
+                <h3 className="font-display text-token-lg font-semibold text-foreground">Profile</h3>
+                <span className="text-token-sm font-bold text-primary">{profileCompletion}%</span>
               </div>
-              <Progress value={profileCompletion} className="h-2 mb-4" />
-              <ul className="space-y-2">
+              <Progress value={profileCompletion} className="h-2 mb-token-4" />
+              <ul className="space-y-token-2">
                 {profileChecklist.map((item) => (
-                  <li key={item.label} className="flex items-center gap-2 text-sm">
+                  <li key={item.label} className="flex items-center gap-token-2 text-token-sm">
                     {item.done
                       ? <FiCheckCircle className="text-primary text-base flex-shrink-0" />
                       : <FiAlertCircle className="text-muted-foreground text-base flex-shrink-0" />}
@@ -241,7 +241,7 @@ const DashboardHome = () => {
                   </li>
                 ))}
               </ul>
-              <Button variant="outline" size="sm" asChild className="w-full mt-4">
+              <Button variant="outline" size="sm" asChild className="w-full mt-token-4">
                 <Link to="/dashboard/edit-profile">Complete Profile</Link>
               </Button>
             </CardContent>
@@ -251,29 +251,29 @@ const DashboardHome = () => {
         {/* Recent Interests */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card className="h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-lg font-semibold text-foreground">Recent Interests</h3>
-                <Link to="/dashboard/interests" className="text-xs text-primary font-medium hover:underline">View All</Link>
+            <CardContent className="p-token-6">
+              <div className="flex items-center justify-between mb-token-4">
+                <h3 className="font-display text-token-lg font-semibold text-foreground">Recent Interests</h3>
+                <Link to="/dashboard/interests" className="text-token-xs text-primary font-medium hover:underline">View All</Link>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-token-3">
                 {recentInterests.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-token-sm text-muted-foreground text-center py-token-4">
                     No interests yet. Complete your profile to get noticed!
                   </p>
                 ) : (
                   recentInterests.map((interest) => (
-                    <div key={interest.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                      <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0">
+                    <div key={interest.id} className="flex items-center gap-token-3 p-token-3 rounded-lg bg-muted">
+                      <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">
                         {interest.from_profile?.first_name?.charAt(0) || "?"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
+                        <p className="text-token-sm font-medium text-foreground truncate">
                           {interest.from_profile?.first_name} {interest.from_profile?.last_name}
                         </p>
-                        <p className="text-xs text-muted-foreground">{interest.from_profile?.city || "Unknown"}</p>
+                        <p className="text-token-xs text-muted-foreground">{interest.from_profile?.city || "Unknown"}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      <span className={`text-token-xs px-token-2 py-token-1 rounded-full font-medium ${
                         interest.status === "accepted"
                           ? "bg-primary/10 text-primary"
                           : "bg-accent/20 text-accent-foreground"
@@ -291,34 +291,34 @@ const DashboardHome = () => {
         {/* Suggested Matches */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           <Card className="h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-lg font-semibold text-foreground">Suggested Matches</h3>
-                <Link to="/dashboard/search" className="text-xs text-primary font-medium hover:underline">Search More</Link>
+            <CardContent className="p-token-6">
+              <div className="flex items-center justify-between mb-token-4">
+                <h3 className="font-display text-token-lg font-semibold text-foreground">Suggested Matches</h3>
+                <Link to="/dashboard/search" className="text-token-xs text-primary font-medium hover:underline">Search More</Link>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-token-3">
                 {suggestedMatches.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-token-sm text-muted-foreground text-center py-token-4">
                     No matches yet. More users are joining every day!
                   </p>
                 ) : (
                   suggestedMatches.map((match) => (
-                    <div key={match.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                      <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-accent-foreground text-sm font-bold flex-shrink-0">
+                    <div key={match.id} className="flex items-center gap-token-3 p-token-3 rounded-lg bg-muted">
+                      <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-accent-foreground text-token-sm font-bold flex-shrink-0">
                         {match.first_name?.charAt(0) || "?"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate flex items-center gap-1">
+                        <p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">
                           {match.first_name} {match.last_name?.charAt(0)}.
                           {match.is_verified && <FiShield className="text-primary text-xs" />}
                         </p>
-                        <p className="text-xs text-muted-foreground">{match.city || "Unknown"}</p>
+                        <p className="text-token-xs text-muted-foreground">{match.city || "Unknown"}</p>
                       </div>
                     </div>
                   ))
                 )}
               </div>
-              <Button variant="hero" size="sm" asChild className="w-full mt-4">
+              <Button variant="hero" size="sm" asChild className="w-full mt-token-4">
                 <Link to="/dashboard/search">
                   <FiSearch className="mr-1 text-sm" /> Find Matches
                 </Link>
@@ -331,17 +331,17 @@ const DashboardHome = () => {
       {/* Quick Actions */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <Card>
-          <CardContent className="p-6">
-            <h3 className="font-display text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <CardContent className="p-token-6">
+            <h3 className="font-display text-token-lg font-semibold text-foreground mb-token-4">Quick Actions</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-token-3">
               {quickActions.map((action) => (
                 <Link
                   key={action.label}
                   to={action.to}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-muted hover:bg-primary/5 transition-colors text-center"
+                  className="action-card"
                 >
                   <action.icon className="text-primary text-xl" />
-                  <span className="text-xs font-medium text-foreground">{action.label}</span>
+                  <span className="text-token-xs font-medium text-foreground">{action.label}</span>
                 </Link>
               ))}
             </div>
