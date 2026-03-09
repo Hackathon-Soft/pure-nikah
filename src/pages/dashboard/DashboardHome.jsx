@@ -115,6 +115,9 @@ const DashboardHome = () => {
 
   return (
     <div className="p-token-4 md:p-token-8 space-y-token-6 max-w-6xl">
+      {/* Public Notices */}
+      <NoticeBanner />
+
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-token-2xl md:text-token-3xl font-display font-bold text-foreground">
