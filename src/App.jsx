@@ -133,6 +133,7 @@ const App = () => (
               <Route path="verification" element={<Suspense fallback={<PageLoader />}><AdminVerification /></Suspense>} />
               <Route path="success-stories" element={<Suspense fallback={<PageLoader />}><AdminSuccessStories /></Suspense>} />
               <Route path="reports" element={<Suspense fallback={<PageLoader />}><AdminReports /></Suspense>} />
+              <Route path="analytics" element={<Suspense fallback={<PageLoader />}><AdminAnalytics /></Suspense>} />
               <Route path="settings" element={<Suspense fallback={<PageLoader />}><AdminSettings /></Suspense>} />
             </Route>
 

@@ -349,6 +349,97 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "get_analytics": {
+        const [
+          totalProfilesRes,
+          verifiedRes,
+          unverifiedRes,
+          pendingVerifRes,
+          rejectedVerifRes,
+          totalInterestsRes,
+          profilesData,
+          monthlyData,
+        ] = await Promise.all([
+          adminClient.from("profiles").select("*", { count: "exact", head: true }),
+          adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_verified", true),
+          adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_verified", false),
+          adminClient.from("verification_requests").select("*", { count: "exact", head: true }).eq("status", "pending"),
+          adminClient.from("verification_requests").select("*", { count: "exact", head: true }).eq("status", "rejected"),
+          adminClient.from("interests").select("*", { count: "exact", head: true }),
+          adminClient.from("profiles").select("gender, city, sect, marital_status, created_at"),
+          // Active users (updated in last 30 days)
+          adminClient.from("profiles").select("*", { count: "exact", head: true })
+            .gte("updated_at", new Date(Date.now() - 30 * 86400000).toISOString()),
+        ]);
+
+        const profiles = profilesData.data || [];
+
+        // Gender distribution
+        const genderMap: Record<string, number> = {};
+        profiles.forEach((p: any) => {
+          const g = p.gender === "male" ? "Male" : p.gender === "female" ? "Female" : "Other";
+          genderMap[g] = (genderMap[g] || 0) + 1;
+        });
+        const genderDistribution = Object.entries(genderMap).map(([name, value]) => ({ name, value }));
+
+        // Top cities
+        const cityMap: Record<string, number> = {};
+        profiles.forEach((p: any) => {
+          if (p.city) cityMap[p.city] = (cityMap[p.city] || 0) + 1;
+        });
+        const topCities = Object.entries(cityMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([name, count]) => ({ name, count }));
+
+        // Sect distribution
+        const sectMap: Record<string, number> = {};
+        profiles.forEach((p: any) => {
+          if (p.sect) sectMap[p.sect] = (sectMap[p.sect] || 0) + 1;
+        });
+        const sectDistribution = Object.entries(sectMap).map(([name, value]) => ({ name, value }));
+
+        // Marital status
+        const maritalMap: Record<string, number> = {};
+        profiles.forEach((p: any) => {
+          const ms = p.marital_status || "Unknown";
+          const label = ms.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+          maritalMap[label] = (maritalMap[label] || 0) + 1;
+        });
+        const maritalDistribution = Object.entries(maritalMap).map(([name, count]) => ({ name, count }));
+
+        // Monthly signups (last 6 months)
+        const monthlySignups: { month: string; count: number }[] = [];
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date();
+          d.setMonth(d.getMonth() - i);
+          const monthName = d.toLocaleString("default", { month: "short", year: "2-digit" });
+          const start = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+          const end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59).toISOString();
+          const count = profiles.filter((p: any) => p.created_at >= start && p.created_at <= end).length;
+          monthlySignups.push({ month: monthName, count });
+        }
+
+        result = {
+          totalProfiles: totalProfilesRes.count || 0,
+          activeUsers: monthlyData.count || 0,
+          totalInterests: totalInterestsRes.count || 0,
+          avgCompatibility: 72, // placeholder
+          genderDistribution,
+          topCities,
+          sectDistribution,
+          maritalDistribution,
+          monthlySignups,
+          verificationStats: {
+            verified: verifiedRes.count || 0,
+            unverified: unverifiedRes.count || 0,
+            pending: pendingVerifRes.count || 0,
+            rejected: rejectedVerifRes.count || 0,
+          },
+        };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
           status: 400,
