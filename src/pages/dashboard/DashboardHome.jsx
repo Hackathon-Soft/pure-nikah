@@ -6,14 +6,17 @@ import { Link } from "react-router-dom";
 import {
   FiUser, FiHeart, FiMessageSquare, FiShield,
   FiSearch, FiStar, FiAlertCircle, FiCheckCircle,
-  FiClock, FiEye, FiArrowRight,
+  FiClock, FiEye, FiArrowRight, FiZap, FiInfinity,
 } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
+  const { data: settings = {} } = usePlatformSettings();
+  const { msgCount, viewCount, interestCount, favCount } = useDailyUsage();
 
   const { data: viewsCount = 0 } = useQuery({
     queryKey: ["profile-views-count", user?.id],
@@ -159,6 +162,62 @@ const DashboardHome = () => {
             </CardContent>
           </Card>
         ))}
+      </motion.div>
+
+      {/* Daily Usage Summary */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FiZap className="text-primary text-sm" />
+                </div>
+                <h3 className="font-display text-base font-semibold text-foreground">Today's Activity</h3>
+              </div>
+              <span className="text-xs text-muted-foreground">Resets at midnight</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { icon: FiMessageSquare, label: "Messages Sent", used: msgCount, limit: settings.daily_messages_limit ?? 0, color: "text-blue-500", to: "/dashboard/messages" },
+                { icon: FiEye,           label: "Profiles Viewed", used: viewCount, limit: settings.daily_profile_views_limit ?? 0, color: "text-purple-500", to: "/dashboard/search" },
+                { icon: FiHeart,         label: "Interests Sent",  used: interestCount, limit: settings.daily_interests_limit ?? 0, color: "text-rose-500", to: "/dashboard/interests" },
+                { icon: FiStar,          label: "Favorites Added", used: favCount, limit: settings.daily_favorites_limit ?? 0, color: "text-amber-500", to: "/dashboard/favorites" },
+              ].map(({ icon: Icon, label, used, limit, color, to }) => {
+                const unlimited = !limit || limit === 0;
+                const pct = unlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
+                const exceeded = !unlimited && used >= limit;
+                const nearLimit = !unlimited && pct >= 80;
+                return (
+                  <Link key={label} to={to} className="group rounded-xl border border-border bg-muted/40 hover:bg-muted transition-colors p-3 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <Icon className={`text-sm ${color}`} />
+                      {unlimited
+                        ? <FiInfinity className="text-xs text-muted-foreground" title="Unlimited" />
+                        : <span className={`text-xs font-semibold ${exceeded ? "text-destructive" : nearLimit ? "text-amber-500" : "text-muted-foreground"}`}>
+                            {used}/{limit}
+                          </span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">{label}</p>
+                    {unlimited ? (
+                      <div className="h-1.5 rounded-full bg-border" />
+                    ) : (
+                      <div className="h-1.5 rounded-full bg-border overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${exceeded ? "bg-destructive" : nearLimit ? "bg-amber-400" : "bg-primary"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    )}
+                    {exceeded && (
+                      <p className="text-xs font-medium text-destructive">Limit reached</p>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* Three Column Section */}
