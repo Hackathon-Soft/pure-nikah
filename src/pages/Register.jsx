@@ -75,7 +75,7 @@ const Register = () => {
           {isSubmitting ? "Creating account..." : "Create Account"}
         </Button>
       </form>
-      <p className="text-center text-token-sm text-muted-foreground mt-token-6">Already have an account?{" "}<Link to="/login" className="link-primary">Sign In</Link></p>
+      <p className="auth-footer">Already have an account?{" "}<Link to="/login" className="link-primary">Sign In</Link></p>
     </motion.div>
   );
 };

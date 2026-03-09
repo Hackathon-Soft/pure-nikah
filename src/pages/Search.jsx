@@ -32,7 +32,6 @@ const SearchPage = () => {
   const [cityFilter, setCityFilter] = useState("any");
   const [searchText, setSearchText] = useState("");
 
-  // Fetch profiles from database — exclude married users
   const { data: dbProfiles = [], isLoading } = useQuery({
     queryKey: ["search-profiles"],
     queryFn: async () => {
@@ -45,7 +44,6 @@ const SearchPage = () => {
     },
   });
 
-  // Filter out current user's profile
   const profiles = dbProfiles.filter(p => p.user_id !== user?.id);
 
   const myPreferences = profile ? {
@@ -109,11 +107,11 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted islamic-pattern">
+    <div className="search-page">
       <div className="app-container py-token-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="page-title mb-token-2">Search Proposals</h1>
-          <p className="text-muted-foreground mb-token-6">Find proposals by location, cast, preferences, or custom filters.</p>
+          <p className="text-body-muted mb-token-6">Find proposals by location, cast, preferences, or custom filters.</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="flex gap-token-3 mb-token-6 flex-wrap">
@@ -137,15 +135,15 @@ const SearchPage = () => {
         {(searchType === "widowed" || searchType === "divorced") && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-token-6">
             <Card className="border-primary/30 bg-primary/5">
-              <CardContent className="p-token-4 flex items-center gap-token-4 flex-wrap">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <CardContent className="info-banner">
+                <div className="info-banner-icon">
                   <FiHeart className="text-primary" style={{ fontSize: "var(--size-icon)" }} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-token-sm font-semibold text-foreground">
+                <div className="info-banner-content">
+                  <p className="info-banner-title">
                     {searchType === "widowed" ? "Special Support for Widowed Members" : "Fresh Start for Divorced Members"}
                   </p>
-                  <p className="text-token-xs text-muted-foreground">
+                  <p className="info-banner-text">
                     {searchType === "widowed"
                       ? "We understand your journey. Enjoy free premium features, priority matching, and a free verified badge as our support."
                       : "Everyone deserves a second chance. Get 50% off premium, priority search placement, and free verification."}
@@ -157,10 +155,10 @@ const SearchPage = () => {
           </motion.div>
         )}
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="card-base p-token-4 mb-token-6">
-          <div className="flex flex-col sm:flex-row gap-token-3">
-            <div className="flex-1 relative">
-              <HiOutlineLocationMarker className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: "var(--size-icon)" }} />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="search-bar">
+          <div className="search-bar-inner">
+            <div className="search-input-wrapper">
+              <HiOutlineLocationMarker className="search-input-icon" style={{ fontSize: "var(--size-icon)" }} />
               <Input placeholder="Search by city..." className="pl-10" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
             </div>
             <Button variant="hero"><FiSearch className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} /> Search</Button>
@@ -168,9 +166,9 @@ const SearchPage = () => {
         </motion.div>
 
         {showFilters && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="card-base p-token-6 mb-token-8">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="filter-panel">
             <h3 className="card-section-title mb-token-4">Advanced Filters</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-token-4">
+            <div className="filter-grid">
               <div className="sm:col-span-2">
                 <Label className="text-token-xs">Age Range: {ageRange[0]} - {ageRange[1]}</Label>
                 <Slider min={18} max={60} step={1} value={ageRange} onValueChange={setAgeRange} className="mt-token-3" />
@@ -182,22 +180,22 @@ const SearchPage = () => {
         )}
 
         {isLoading ? (
-          <div className="text-center py-token-12"><p className="text-muted-foreground">Loading profiles...</p></div>
+          <div className="empty-state"><p className="text-body-muted">Loading profiles...</p></div>
         ) : (
           <>
-            <p className="text-token-sm text-muted-foreground mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>
+            <p className="text-body-muted mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>
 
             {withScores.length === 0 ? (
-              <div className="text-center py-token-12">
-                <p className="text-token-lg font-display font-semibold text-foreground mb-token-2">No profiles found</p>
-                <p className="text-token-sm text-muted-foreground">Try adjusting your filters or check back later.</p>
+              <div className="empty-state">
+                <p className="empty-state-title">No profiles found</p>
+                <p className="empty-state-text">Try adjusting your filters or check back later.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-token-6">
+              <div className="grid-3col">
                 {withScores.map((p, i) => (
                   <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
-                    <Card className="overflow-hidden hover:shadow-elevated transition-shadow">
-                      <div className="h-32 bg-gradient-primary relative">
+                    <Card className="card-profile">
+                      <div className="card-profile-header">
                         {p.is_verified && (
                           <div className="verified-badge absolute top-3 right-3">
                             <FiShield style={{ fontSize: "var(--text-xs)" }} /> Verified
@@ -206,14 +204,14 @@ const SearchPage = () => {
                         <div className="absolute top-3 left-3">
                           <CompatibilityBadge score={p.compatibility} preferences={myPreferences} candidate={p} size="sm" />
                         </div>
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[var(--size-avatar)] h-[var(--size-avatar)] rounded-full bg-card border-4 border-card flex items-center justify-center">
-                          <span className="text-token-2xl font-display font-bold text-primary">{p.first_name?.charAt(0) || "?"}</span>
+                        <div className="card-profile-avatar">
+                          <span className="card-profile-avatar-text">{p.first_name?.charAt(0) || "?"}</span>
                         </div>
                       </div>
                       <CardContent className="px-token-4 pt-token-14 pb-token-6 text-center">
                         <h3 className="card-section-title">{p.first_name} {p.last_name?.charAt(0) || ""}.</h3>
-                        <p className="text-token-sm text-muted-foreground">{getAge(p.date_of_birth)} years old • {p.caste || "N/A"}</p>
-                        <div className="flex items-center justify-center gap-token-1 text-token-xs text-muted-foreground mt-token-1">
+                        <p className="text-body-muted">{getAge(p.date_of_birth)} years old • {p.caste || "N/A"}</p>
+                        <div className="flex items-center justify-center gap-token-1 text-body-muted-xs mt-token-1">
                           <FiMapPin style={{ fontSize: "var(--text-xs)" }} /> {p.city || "Unknown"}, {p.country || "Pakistan"}
                         </div>
                         <div className="flex justify-center gap-token-2 mt-token-3 flex-wrap">

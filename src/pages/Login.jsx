@@ -67,7 +67,7 @@ const Login = () => {
           {isSubmitting ? "Signing in..." : "Sign In"}
         </Button>
       </form>
-      <p className="text-center text-token-sm text-muted-foreground mt-token-6">
+      <p className="auth-footer">
         Don't have an account?{" "}
         <Link to="/register" className="link-primary">Register Now</Link>
       </p>

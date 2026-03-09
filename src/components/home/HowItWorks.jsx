@@ -16,16 +16,16 @@ const HowItWorks = () => (
         <h2 className="section-title">How PureNikah Works</h2>
         <p className="section-subtitle">Four simple steps towards a blessed marriage, InshaAllah.</p>
       </motion.div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-token-8">
+      <div className="grid-4col">
         {steps.map((step, i) => (
           <motion.div key={step.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="relative text-center">
-            {i < steps.length - 1 && <div className="hidden md:block absolute top-10 left-[60%] w-[80%] border-t-2 border-dashed border-primary/20" />}
+            {i < steps.length - 1 && <div className="step-connector" />}
             <div className="icon-circle w-[var(--size-avatar)] h-[var(--size-avatar)] mb-token-5">
               <step.icon style={{ fontSize: "var(--size-icon-xl)" }} />
             </div>
-            <div className="badge-sm bg-accent text-accent-foreground font-bold absolute top-0 right-[38%] w-7 h-7 inline-flex items-center justify-center rounded-full">{i + 1}</div>
+            <div className="step-badge">{i + 1}</div>
             <h3 className="card-section-title mb-token-2">{step.title}</h3>
-            <p className="text-token-sm text-muted-foreground leading-token-relaxed">{step.description}</p>
+            <p className="text-body-muted">{step.description}</p>
           </motion.div>
         ))}
       </div>
