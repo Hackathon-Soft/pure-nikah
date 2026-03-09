@@ -440,6 +440,79 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "list_flagged_messages": {
+        const { status: flagStatus } = params;
+        let query = adminClient
+          .from("flagged_messages")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (flagStatus && flagStatus !== "all") {
+          query = query.eq("status", flagStatus);
+        }
+
+        const { data: flaggedRows, error } = await query;
+        if (error) throw error;
+
+        // Enrich with sender profile info
+        const messages = await Promise.all((flaggedRows || []).map(async (flag) => {
+          const { data: profile } = await adminClient
+            .from("profiles")
+            .select("first_name, last_name, is_verified")
+            .eq("user_id", flag.sender_id)
+            .single();
+          
+          return {
+            ...flag,
+            sender_name: profile ? `${profile.first_name} ${profile.last_name}` : "Unknown",
+            sender_verified: profile?.is_verified || false,
+          };
+        }));
+
+        result = { messages };
+        break;
+      }
+
+      case "resolve_flagged_message": {
+        const { flagId, action, adminNotes, userId } = params;
+        if (!flagId || !action) {
+          throw new Error("flagId and action are required");
+        }
+
+        // Update the flagged message status
+        const { error: flagError } = await adminClient
+          .from("flagged_messages")
+          .update({
+            status: "resolved",
+            admin_notes: adminNotes || `Action: ${action}`,
+            reviewed_by: user.id,
+            reviewed_at: new Date().toISOString(),
+          })
+          .eq("id", flagId);
+
+        if (flagError) throw flagError;
+
+        // Take action on user if needed
+        if (action === "warn" && userId) {
+          // Create a notification for the user
+          await adminClient.from("notifications").insert({
+            user_id: userId,
+            type: "warning",
+            title: "Message Policy Warning",
+            message: "One of your messages was flagged for violating our community guidelines. Please keep conversations respectful and appropriate.",
+          });
+        } else if (action === "ban" && userId) {
+          // Ban the user
+          await adminClient
+            .from("profiles")
+            .update({ is_banned: true })
+            .eq("user_id", userId);
+        }
+
+        result = { success: true, action };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
           status: 400,
