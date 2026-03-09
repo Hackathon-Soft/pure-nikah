@@ -478,7 +478,7 @@ const SearchPage = () => {
                 )}
               </div>
             ) : (
-              <div className="grid-3col">
+              <ProtectedContent className="grid-3col">
                 {withScores.map((p, i) => (
                   <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(0.05 * i, 0.5) }}>
                     <Card className="card-profile">
@@ -529,7 +529,7 @@ const SearchPage = () => {
                     </Card>
                   </motion.div>
                 ))}
-              </div>
+              </ProtectedContent>
             )}
           </>
         )}
