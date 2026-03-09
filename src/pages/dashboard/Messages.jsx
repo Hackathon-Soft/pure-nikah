@@ -180,9 +180,9 @@ const Messages = () => {
           <div className="flex-1 overflow-y-auto">
             {conversations.map((c) => (
               <button key={c.id} onClick={() => setSelectedId(c.id)} className={`w-full text-left p-token-4 border-b border-border hover:bg-muted transition-colors flex gap-token-3 ${selected?.id === c.id ? "bg-primary/5" : ""}`}>
-                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{c.otherProfile?.first_name?.charAt(0) || "?"}</div>
+                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{getDisplayName(c.otherProfile).charAt(0)}</div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{c.otherProfile?.first_name || "User"}{c.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+                  <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{getDisplayName(c.otherProfile)}{c.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
                   <p className="text-token-xs text-muted-foreground truncate">{c.last_message || "No messages yet"}</p>
                 </div>
               </button>
