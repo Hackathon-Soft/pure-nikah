@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import PhoneVerification from "@/components/verification/PhoneVerification";
 
 const Settings = () => {
   const { signOut, user, profile, fetchProfile } = useAuth();
@@ -158,6 +159,10 @@ const Settings = () => {
 
       {/* Security */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <PhoneVerification />
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
         <Card><CardContent className="p-token-6 space-y-4">
           <h2 className="card-section-title flex items-center gap-token-2"><FiLock className="text-primary" /> Security</h2>
           <Button variant="outline" onClick={() => navigate("/forgot-password")}>Change Password</Button>

@@ -234,6 +234,36 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_otps: {
+        Row: {
+          attempts: number
+          created_at: string
+          expires_at: string
+          id: string
+          otp_hash: string
+          phone_number: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          expires_at: string
+          id?: string
+          otp_hash: string
+          phone_number: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          expires_at?: string
+          id?: string
+          otp_hash?: string
+          phone_number?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           description: string | null
@@ -314,6 +344,8 @@ export type Database = {
           living_with: string | null
           marital_status: string | null
           mother_occupation: string | null
+          phone_number: string | null
+          phone_verified: boolean
           photo_privacy: string | null
           prayer_level: string | null
           preferred_age_max: number | null
@@ -369,6 +401,8 @@ export type Database = {
           living_with?: string | null
           marital_status?: string | null
           mother_occupation?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean
           photo_privacy?: string | null
           prayer_level?: string | null
           preferred_age_max?: number | null
@@ -424,6 +458,8 @@ export type Database = {
           living_with?: string | null
           marital_status?: string | null
           mother_occupation?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean
           photo_privacy?: string | null
           prayer_level?: string | null
           preferred_age_max?: number | null
