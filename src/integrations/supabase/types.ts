@@ -94,6 +94,51 @@ export type Database = {
           },
         ]
       }
+      flagged_messages: {
+        Row: {
+          admin_notes: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          message_id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_id: string
+          severity: string
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          message_id: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id: string
+          severity?: string
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          message_id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_id?: string
+          severity?: string
+          status?: string
+        }
+        Relationships: []
+      }
       interests: {
         Row: {
           created_at: string
