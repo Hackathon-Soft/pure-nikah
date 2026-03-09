@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FiSend, FiShield, FiAlertTriangle } from "react-icons/fi";
+import { FiSend, FiShield, FiAlertTriangle, FiVideo } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -196,7 +196,12 @@ const Messages = () => {
               <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{getDisplayName(selected?.otherProfile).charAt(0)}</div>
               <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{getDisplayName(selected?.otherProfile)}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
             </div>
-            <WaliManager conversationId={selected?.id} />
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" title="Video call (coming soon)" disabled>
+                <FiVideo className="text-primary" /> Call
+              </Button>
+              <WaliManager conversationId={selected?.id} />
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto p-token-4 space-y-3">
             {messages.map((msg) => (
