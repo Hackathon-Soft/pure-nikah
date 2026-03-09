@@ -11,7 +11,7 @@ import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 import LimitBanner from "@/components/LimitBanner";
 import { toast } from "sonner";
 import WaliManager from "@/components/messaging/WaliManager";
-import { getDisplayName } from "@/lib/displayName";
+import { getDisplayName } from "@/lib/displayName.js";
 
 const Messages = () => {
   const { user } = useAuth();
