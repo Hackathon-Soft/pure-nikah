@@ -241,6 +241,7 @@ export type Database = {
         Row: {
           accept_divorced: boolean | null
           accept_with_children: boolean | null
+          allow_non_verified_views: boolean | null
           bio: string | null
           caste: string | null
           city: string | null
@@ -248,6 +249,7 @@ export type Database = {
           created_at: string
           date_of_birth: string | null
           dietary: string | null
+          display_name: string | null
           education: string | null
           family_type: string | null
           family_values: string | null
@@ -277,9 +279,14 @@ export type Database = {
           profession: string | null
           profile_completed: boolean | null
           quran_recitation: string | null
+          registered_by_name: string | null
+          registered_by_relation: string | null
+          registration_type: string | null
           religious_expectations: string | null
           religious_practice: string | null
           sect: string | null
+          show_in_search: boolean | null
+          show_online_status: boolean | null
           siblings: string | null
           smoking: string | null
           updated_at: string
@@ -289,6 +296,7 @@ export type Database = {
         Insert: {
           accept_divorced?: boolean | null
           accept_with_children?: boolean | null
+          allow_non_verified_views?: boolean | null
           bio?: string | null
           caste?: string | null
           city?: string | null
@@ -296,6 +304,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           dietary?: string | null
+          display_name?: string | null
           education?: string | null
           family_type?: string | null
           family_values?: string | null
@@ -325,9 +334,14 @@ export type Database = {
           profession?: string | null
           profile_completed?: boolean | null
           quran_recitation?: string | null
+          registered_by_name?: string | null
+          registered_by_relation?: string | null
+          registration_type?: string | null
           religious_expectations?: string | null
           religious_practice?: string | null
           sect?: string | null
+          show_in_search?: boolean | null
+          show_online_status?: boolean | null
           siblings?: string | null
           smoking?: string | null
           updated_at?: string
@@ -337,6 +351,7 @@ export type Database = {
         Update: {
           accept_divorced?: boolean | null
           accept_with_children?: boolean | null
+          allow_non_verified_views?: boolean | null
           bio?: string | null
           caste?: string | null
           city?: string | null
@@ -344,6 +359,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           dietary?: string | null
+          display_name?: string | null
           education?: string | null
           family_type?: string | null
           family_values?: string | null
@@ -373,9 +389,14 @@ export type Database = {
           profession?: string | null
           profile_completed?: boolean | null
           quran_recitation?: string | null
+          registered_by_name?: string | null
+          registered_by_relation?: string | null
+          registration_type?: string | null
           religious_expectations?: string | null
           religious_practice?: string | null
           sect?: string | null
+          show_in_search?: boolean | null
+          show_online_status?: boolean | null
           siblings?: string | null
           smoking?: string | null
           updated_at?: string
