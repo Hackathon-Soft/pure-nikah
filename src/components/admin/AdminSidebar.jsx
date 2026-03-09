@@ -4,13 +4,14 @@ import {
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { FiHome, FiUsers, FiCheckCircle, FiAlertTriangle, FiBarChart2 } from "react-icons/fi";
+import { FiHome, FiUsers, FiCheckCircle, FiAlertTriangle, FiSettings } from "react-icons/fi";
 
 const items = [
   { title: "Overview", url: "/admin", icon: FiHome },
   { title: "Users", url: "/admin/users", icon: FiUsers },
   { title: "Verification", url: "/admin/verification", icon: FiCheckCircle },
   { title: "Reports", url: "/admin/reports", icon: FiAlertTriangle },
+  { title: "Settings", url: "/admin/settings", icon: FiSettings },
 ];
 
 export function AdminSidebar() {

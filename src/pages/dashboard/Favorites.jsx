@@ -1,16 +1,23 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FiStar, FiMessageSquare, FiShield, FiMapPin, FiTrash2 } from "react-icons/fi";
+import { FiStar, FiMessageSquare, FiShield, FiMapPin, FiTrash2, FiAlertTriangle } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import LimitBanner from "@/components/LimitBanner";
 
 const Favorites = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { data: settings = {} } = usePlatformSettings();
+  const { favCount, refetchFavs } = useDailyUsage();
+
+  const favLimit = settings.daily_favorites_limit ?? 0;
+  const favLimitReached = favLimit > 0 && favCount >= favLimit;
 
   const { data: favorites = [], isLoading } = useQuery({
     queryKey: ["favorites", user?.id],
@@ -32,6 +39,7 @@ const Favorites = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      refetchFavs();
       toast({ title: "Removed", description: "Profile removed from favorites." });
     },
   });
@@ -42,6 +50,18 @@ const Favorites = () => {
         <h1 className="text-token-2xl font-display font-bold text-foreground flex items-center gap-token-2"><FiStar className="text-accent-foreground" /> Favorites</h1>
         <p className="text-muted-foreground text-token-sm mt-token-1">Profiles you've saved.</p>
       </motion.div>
+
+      {/* Daily limit banner */}
+      {favLimit > 0 && (
+        <LimitBanner label="Daily favorites added" used={favCount} limit={favLimit} icon={FiStar} />
+      )}
+
+      {favLimitReached && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs bg-destructive/10 text-destructive border border-destructive/30">
+          <FiAlertTriangle />
+          Daily favorites limit ({favLimit}) reached. You can still remove existing favorites.
+        </div>
+      )}
 
       {favorites.length === 0 ? (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

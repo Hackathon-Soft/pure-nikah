@@ -2,18 +2,42 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FiSend, FiShield } from "react-icons/fi";
+import { FiSend, FiShield, FiAlertTriangle } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import LimitBanner from "@/components/LimitBanner";
+import { toast } from "sonner";
 
 const Messages = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState(null);
   const [newMsg, setNewMsg] = useState("");
+  const [lastSentAt, setLastSentAt] = useState(null);
   const messagesEndRef = useRef(null);
+
+  const { data: settings = {} } = usePlatformSettings();
+  const { msgCount, refetchMsg } = useDailyUsage();
+
+  const dailyLimit = settings.daily_messages_limit ?? 0;
+  const cooldownSec = settings.message_cooldown_seconds ?? 5;
+  const limitReached = dailyLimit > 0 && msgCount >= dailyLimit;
+
+  // Cooldown state
+  const [cooldownLeft, setCooldownLeft] = useState(0);
+  useEffect(() => {
+    if (!lastSentAt || cooldownSec <= 0) return;
+    const interval = setInterval(() => {
+      const elapsed = (Date.now() - lastSentAt) / 1000;
+      const left = Math.max(0, Math.ceil(cooldownSec - elapsed));
+      setCooldownLeft(left);
+      if (left === 0) clearInterval(interval);
+    }, 500);
+    return () => clearInterval(interval);
+  }, [lastSentAt, cooldownSec]);
 
   // Fetch conversations with other user's profile
   const { data: conversations = [] } = useQuery({
@@ -27,7 +51,6 @@ const Messages = () => {
 
       if (!data) return [];
 
-      // Fetch profiles for each conversation partner
       const enriched = await Promise.all(data.map(async (c) => {
         const otherId = c.user1_id === user.id ? c.user2_id : c.user1_id;
         const { data: profile } = await supabase
@@ -83,7 +106,6 @@ const Messages = () => {
         content,
       });
       if (error) throw error;
-      // Update conversation last message
       await supabase.from("conversations").update({
         last_message: content,
         last_message_at: new Date().toISOString(),
@@ -92,14 +114,28 @@ const Messages = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", selected?.id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      refetchMsg();
       setNewMsg("");
+      setLastSentAt(Date.now());
+      setCooldownLeft(cooldownSec);
     },
   });
 
   const handleSend = () => {
     if (!newMsg.trim() || !selected) return;
+
+    if (limitReached) {
+      toast.error(`Daily message limit of ${dailyLimit} reached. Try again tomorrow.`);
+      return;
+    }
+    if (cooldownLeft > 0) {
+      toast.warning(`Please wait ${cooldownLeft}s before sending another message.`);
+      return;
+    }
     sendMutation.mutate(newMsg.trim());
   };
+
+  const isSendDisabled = sendMutation.isPending || limitReached || cooldownLeft > 0;
 
   if (conversations.length === 0) {
     return (
@@ -113,52 +149,77 @@ const Messages = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-var(--size-navbar))]">
-      <div className="w-80 border-r border-border bg-card flex-shrink-0 hidden md:flex flex-col">
-        <div className="p-token-4 border-b border-border"><h2 className="font-display text-token-lg font-semibold text-foreground">Messages</h2></div>
-        <div className="flex-1 overflow-y-auto">
-          {conversations.map((c) => (
-            <button key={c.id} onClick={() => setSelectedId(c.id)} className={`w-full text-left p-token-4 border-b border-border hover:bg-muted transition-colors flex gap-token-3 ${selected?.id === c.id ? "bg-primary/5" : ""}`}>
-              <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{c.otherProfile?.first_name?.charAt(0) || "?"}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{c.otherProfile?.first_name || "User"}{c.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
-                <p className="text-token-xs text-muted-foreground truncate">{c.last_message || "No messages yet"}</p>
-              </div>
-            </button>
-          ))}
+    <div className="flex flex-col h-[calc(100vh-var(--size-navbar))]">
+      {/* Limit banner at top */}
+      {dailyLimit > 0 && (
+        <div className="px-4 pt-3 pb-0">
+          <LimitBanner label="Messages" used={msgCount} limit={dailyLimit} icon={FiSend} />
         </div>
-      </div>
+      )}
 
-      <div className="flex-1 flex flex-col">
-        <div className="p-token-4 border-b border-border bg-card flex items-center gap-token-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{selected?.otherProfile?.first_name?.charAt(0) || "?"}</div>
-          <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{selected?.otherProfile?.first_name || "User"}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-80 border-r border-border bg-card flex-shrink-0 hidden md:flex flex-col">
+          <div className="p-token-4 border-b border-border"><h2 className="font-display text-token-lg font-semibold text-foreground">Messages</h2></div>
+          <div className="flex-1 overflow-y-auto">
+            {conversations.map((c) => (
+              <button key={c.id} onClick={() => setSelectedId(c.id)} className={`w-full text-left p-token-4 border-b border-border hover:bg-muted transition-colors flex gap-token-3 ${selected?.id === c.id ? "bg-primary/5" : ""}`}>
+                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-sm font-bold flex-shrink-0">{c.otherProfile?.first_name?.charAt(0) || "?"}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between"><p className="text-token-sm font-medium text-foreground truncate flex items-center gap-token-1">{c.otherProfile?.first_name || "User"}{c.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+                  <p className="text-token-xs text-muted-foreground truncate">{c.last_message || "No messages yet"}</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-token-4 space-y-3">
-          {messages.map((msg) => (
-            <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.sender_id === user.id ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[70%] rounded-2xl px-token-4 py-token-3 ${msg.sender_id === user.id ? "bg-gradient-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
-                <p className="text-token-sm">{msg.content}</p>
-                <p className={`text-token-xs mt-token-1 ${msg.sender_id === user.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
+
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="p-token-4 border-b border-border bg-card flex items-center gap-token-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{selected?.otherProfile?.first_name?.charAt(0) || "?"}</div>
+            <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{selected?.otherProfile?.first_name || "User"}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-token-4 space-y-3">
+            {messages.map((msg) => (
+              <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.sender_id === user.id ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[70%] rounded-2xl px-token-4 py-token-3 ${msg.sender_id === user.id ? "bg-gradient-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                  <p className="text-token-sm">{msg.content}</p>
+                  <p className={`text-token-xs mt-token-1 ${msg.sender_id === user.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                    {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Limit / cooldown warning */}
+          {(limitReached || cooldownLeft > 0) && (
+            <div className="px-token-4 pb-2">
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${limitReached ? "bg-destructive/10 text-destructive border border-destructive/30" : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800"}`}>
+                <FiAlertTriangle className="flex-shrink-0" />
+                {limitReached
+                  ? `Daily message limit (${dailyLimit}) reached. Come back tomorrow.`
+                  : `Please wait ${cooldownLeft}s before sending again.`}
               </div>
-            </motion.div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="p-token-4 border-t border-border bg-card">
-          <div className="flex gap-token-3">
-            <Input
-              value={newMsg}
-              onChange={(e) => setNewMsg(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1"
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            />
-            <Button variant="hero" size="icon" onClick={handleSend} disabled={sendMutation.isPending}>
-              <FiSend style={{ fontSize: "var(--size-icon)" }} />
-            </Button>
+            </div>
+          )}
+
+          <div className="p-token-4 border-t border-border bg-card">
+            <div className="flex gap-token-3">
+              <Input
+                value={newMsg}
+                onChange={(e) => setNewMsg(e.target.value)}
+                placeholder={limitReached ? "Daily limit reached" : "Type a message..."}
+                className="flex-1"
+                disabled={isSendDisabled && cooldownLeft === 0 && limitReached}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              />
+              <Button variant="hero" size="icon" onClick={handleSend} disabled={isSendDisabled} title={cooldownLeft > 0 ? `Wait ${cooldownLeft}s` : limitReached ? "Limit reached" : "Send"}>
+                {cooldownLeft > 0
+                  ? <span className="text-xs font-bold">{cooldownLeft}</span>
+                  : <FiSend style={{ fontSize: "var(--size-icon)" }} />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
