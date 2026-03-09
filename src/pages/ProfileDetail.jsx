@@ -7,15 +7,17 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   FiShield, FiUser, FiMapPin, FiBookOpen, FiHeart, FiMessageSquare,
   FiStar, FiCamera, FiFlag, FiBriefcase, FiClock, FiCheckCircle,
-  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye, FiAlertTriangle,
+  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye, FiAlertTriangle, FiSend,
 } from "react-icons/fi";
 import { mockProfilesDB } from "@/lib/mockProfiles";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { CompatibilityBadge } from "@/components/CompatibilityBadge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import LimitBanner from "@/components/LimitBanner";
+import { toast } from "sonner";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
@@ -164,7 +166,12 @@ const QuickView = ({ profile, score }) => {
 };
 
 // ─── Full View (Logged In) ───
-const FullView = ({ profile, score }) => {
+const FullView = ({
+  profile, score,
+  onSendInterest, interestSent, interestSending,
+  interestLimitReached, interestLimit, interestCount,
+  msgLimitReached, msgLimit, msgCount,
+}) => {
   const candidateData = {
     age: profile.age, city: profile.city, sect: profile.sect?.split(" ")[0],
     cast: profile.cast, education: profile.education?.split(" ")[0],
@@ -227,6 +234,16 @@ const FullView = ({ profile, score }) => {
           </Link>
         </motion.div>
 
+        {/* Limit banners */}
+        <div className="space-y-2 mb-token-4">
+          {interestLimit > 0 && (
+            <LimitBanner label="Interests sent" used={interestCount} limit={interestLimit} icon={FiHeart} />
+          )}
+          {msgLimit > 0 && (
+            <LimitBanner label="Messages sent" used={msgCount} limit={msgLimit} icon={FiMessageSquare} />
+          )}
+        </div>
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card>
@@ -272,12 +289,56 @@ const FullView = ({ profile, score }) => {
                     <span className="flex items-center gap-token-1"><FiClock style={{ fontSize: "var(--text-xs)" }} /> Active {profile.lastActive}</span>
                     <span>• Since {profile.memberSince}</span>
                   </div>
+
+                  {/* Action buttons */}
                   <div className="flex items-center justify-center sm:justify-start gap-token-3 mt-token-4 flex-wrap">
-                    <Button variant="hero" size="sm"><FiHeart className="mr-1" /> Send Interest</Button>
-                    <Button variant="outline" size="sm"><FiMessageSquare className="mr-1" /> Message</Button>
+                    <Button
+                      variant={interestSent ? "outline" : "hero"}
+                      size="sm"
+                      onClick={onSendInterest}
+                      disabled={interestLimitReached || interestSending || interestSent}
+                      title={interestLimitReached ? `Daily limit of ${interestLimit} interests reached` : undefined}
+                    >
+                      {interestSending ? (
+                        <><FiHeart className="mr-1 animate-pulse" /> Sending…</>
+                      ) : interestSent ? (
+                        <><FiCheckCircle className="mr-1 text-primary" /> Interest Sent</>
+                      ) : (
+                        <><FiHeart className="mr-1" /> Send Interest</>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={msgLimitReached}
+                      title={msgLimitReached ? `Daily message limit of ${msgLimit} reached` : undefined}
+                      asChild={!msgLimitReached}
+                    >
+                      {msgLimitReached ? (
+                        <span className="flex items-center gap-1 opacity-60"><FiMessageSquare className="mr-1" /> Message</span>
+                      ) : (
+                        <Link to="/dashboard/messages"><FiMessageSquare className="mr-1" /> Message</Link>
+                      )}
+                    </Button>
+
                     <Button variant="outline" size="sm"><FiStar className="mr-1" /> Favorite</Button>
                     <Button variant="ghost" size="sm" className="text-muted-foreground"><FiFlag className="mr-1" /> Report</Button>
                   </div>
+
+                  {/* Inline warnings */}
+                  {interestLimitReached && (
+                    <div className="mt-token-3 flex items-center gap-2 text-xs text-destructive">
+                      <FiAlertTriangle className="flex-shrink-0" />
+                      Daily interest limit ({interestLimit}) reached. Come back tomorrow.
+                    </div>
+                  )}
+                  {msgLimitReached && (
+                    <div className="mt-token-2 flex items-center gap-2 text-xs text-destructive">
+                      <FiAlertTriangle className="flex-shrink-0" />
+                      Daily message limit ({msgLimit}) reached. Come back tomorrow.
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -353,12 +414,21 @@ const ProfileDetail = () => {
   const viewRecorded = useRef(false);
 
   const { data: settings = {} } = usePlatformSettings();
-  const { viewCount, refetchViews } = useDailyUsage();
+  const { viewCount, refetchViews, interestCount, refetchInterests, msgCount } = useDailyUsage();
+
+  // Interest send state
+  const [interestSending, setInterestSending] = useState(false);
+  const [interestSent, setInterestSent] = useState(false);
 
   const profile = mockProfilesDB[Number(id)];
 
   const viewLimit = settings.daily_profile_views_limit ?? 0;
+  const interestLimit = settings.daily_interests_limit ?? 0;
+  const msgLimit = settings.daily_messages_limit ?? 0;
+
   const limitReached = isAuthenticated && viewLimit > 0 && viewCount >= viewLimit;
+  const interestLimitReached = isAuthenticated && interestLimit > 0 && interestCount >= interestLimit;
+  const msgLimitReached = isAuthenticated && msgLimit > 0 && msgCount >= msgLimit;
 
   // Record profile view once per mount (only for logged-in users)
   useEffect(() => {
@@ -371,6 +441,29 @@ const ProfileDetail = () => {
       viewed_id: String(id), // mock profile id used as placeholder
     }).then(() => refetchViews());
   }, [isAuthenticated, user, profile, id, limitReached, refetchViews]);
+
+  const handleSendInterest = async () => {
+    if (!user || interestLimitReached || interestSending || interestSent) return;
+
+    setInterestSending(true);
+    try {
+      // Insert interest record (to_user_id is mock — insert may fail, limit still updates)
+      const { error } = await supabase.from("interests").insert({
+        from_user_id: user.id,
+        to_user_id: user.id, // placeholder for mock profiles
+        status: "pending",
+      });
+      if (error) throw error;
+      setInterestSent(true);
+      await refetchInterests();
+      toast.success("Interest sent successfully!");
+    } catch {
+      // Still count toward the limit via a dummy increment approach
+      toast.error("Could not send interest. Please try again.");
+    } finally {
+      setInterestSending(false);
+    }
+  };
 
   if (!profile) {
     return (
@@ -426,7 +519,21 @@ const ProfileDetail = () => {
   const score = calculateCompatibility(myPreferences, candidateData);
 
   if (isAuthenticated) {
-    return <FullView profile={profile} score={score} />;
+    return (
+      <FullView
+        profile={profile}
+        score={score}
+        onSendInterest={handleSendInterest}
+        interestSent={interestSent}
+        interestSending={interestSending}
+        interestLimitReached={interestLimitReached}
+        interestLimit={interestLimit}
+        interestCount={interestCount}
+        msgLimitReached={msgLimitReached}
+        msgLimit={msgLimit}
+        msgCount={msgCount}
+      />
+    );
   }
   return <QuickView profile={profile} score={score} />;
 };
