@@ -13,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 import NoticeBanner from "@/components/notices/NoticeBanner";
+import { calculateCompatibility } from "@/lib/compatibility";
+import { CompatibilityBadge } from "@/components/CompatibilityBadge";
+import { getDisplayName } from "@/lib/displayName.js";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
