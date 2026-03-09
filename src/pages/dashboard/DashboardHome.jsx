@@ -15,6 +15,8 @@ import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
+  const { data: settings = {} } = usePlatformSettings();
+  const { msgCount, viewCount, interestCount, favCount } = useDailyUsage();
 
   const { data: viewsCount = 0 } = useQuery({
     queryKey: ["profile-views-count", user?.id],
