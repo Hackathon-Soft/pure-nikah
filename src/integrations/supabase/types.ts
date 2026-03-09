@@ -540,6 +540,42 @@ export type Database = {
         }
         Relationships: []
       }
+      public_notices: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          priority: number
+          title: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title: string
+          type?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           admin_notes: string | null
