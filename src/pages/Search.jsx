@@ -99,6 +99,23 @@ const SearchPage = () => {
     return count;
   }, [filters]);
 
+  // Fetch user email for hidden_from check
+  const userEmail = user?.email?.toLowerCase() || "";
+
+  // Fetch hidden_from_users to filter out profiles that hide from current user
+  const { data: hiddenFromMe = [] } = useQuery({
+    queryKey: ["hidden-from-me", userEmail],
+    queryFn: async () => {
+      if (!userEmail) return [];
+      const { data } = await supabase
+        .from("hidden_from_users")
+        .select("profile_owner_id")
+        .eq("hidden_email", userEmail);
+      return data?.map((h) => h.profile_owner_id) || [];
+    },
+    enabled: !!userEmail,
+  });
+
   const { data: dbProfiles = [], isLoading } = useQuery({
     queryKey: ["search-profiles"],
     queryFn: async () => {
@@ -111,7 +128,12 @@ const SearchPage = () => {
     },
   });
 
-  const profiles = dbProfiles.filter((p) => p.user_id !== user?.id);
+  // Filter out own profile and profiles that hide from current user
+  const profiles = dbProfiles.filter((p) => {
+    if (p.user_id === user?.id) return false;
+    if (hiddenFromMe.includes(p.user_id)) return false;
+    return true;
+  });
 
   const myPreferences = profile
     ? {

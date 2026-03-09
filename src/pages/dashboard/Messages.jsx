@@ -191,9 +191,12 @@ const Messages = () => {
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="p-token-4 border-b border-border bg-card flex items-center gap-token-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{selected?.otherProfile?.first_name?.charAt(0) || "?"}</div>
-            <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{selected?.otherProfile?.first_name || "User"}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+          <div className="p-token-4 border-b border-border bg-card flex items-center justify-between">
+            <div className="flex items-center gap-token-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-token-xs font-bold">{getDisplayName(selected?.otherProfile).charAt(0)}</div>
+              <div><p className="text-token-sm font-medium text-foreground flex items-center gap-token-1">{getDisplayName(selected?.otherProfile)}{selected?.otherProfile?.is_verified && <FiShield className="text-primary" style={{ fontSize: "var(--text-xs)" }} />}</p></div>
+            </div>
+            <WaliManager conversationId={selected?.id} />
           </div>
           <div className="flex-1 overflow-y-auto p-token-4 space-y-3">
             {messages.map((msg) => (
