@@ -264,6 +264,33 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_access_requests: {
+        Row: {
+          created_at: string
+          id: string
+          profile_owner_id: string
+          requester_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_owner_id: string
+          requester_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_owner_id?: string
+          requester_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           description: string | null
