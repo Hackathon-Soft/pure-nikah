@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import NoticeBanner from "@/components/notices/NoticeBanner";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
@@ -114,6 +115,9 @@ const DashboardHome = () => {
 
   return (
     <div className="p-token-4 md:p-token-8 space-y-token-6 max-w-6xl">
+      {/* Public Notices */}
+      <NoticeBanner />
+
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-token-2xl md:text-token-3xl font-display font-bold text-foreground">

@@ -61,6 +61,7 @@ const AdminSettings       = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminSuccessStories = lazy(() => import("./pages/admin/AdminSuccessStories"));
 const AdminAnalytics        = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminContentModeration = lazy(() => import("./pages/admin/AdminContentModeration"));
+const AdminSupport          = lazy(() => import("./pages/admin/AdminSupport"));
 
 // Fallback spinner shown while lazy chunks load
 const PageLoader = () => (
@@ -137,6 +138,7 @@ const App = () => (
               <Route path="reports" element={<Suspense fallback={<PageLoader />}><AdminReports /></Suspense>} />
               <Route path="analytics" element={<Suspense fallback={<PageLoader />}><AdminAnalytics /></Suspense>} />
               <Route path="settings" element={<Suspense fallback={<PageLoader />}><AdminSettings /></Suspense>} />
+              <Route path="support" element={<Suspense fallback={<PageLoader />}><AdminSupport /></Suspense>} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
