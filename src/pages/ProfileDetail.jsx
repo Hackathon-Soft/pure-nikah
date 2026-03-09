@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 import LimitBanner from "@/components/LimitBanner";
 import { toast } from "sonner";
+import { ProtectedContent } from "@/components/protection/ContentProtection";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
