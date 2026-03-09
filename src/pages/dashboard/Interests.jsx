@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FiHeart, FiX, FiCheck, FiShield, FiMapPin, FiMessageSquare, FiClock, FiUser } from "react-icons/fi";
+import { FiHeart, FiX, FiCheck, FiShield, FiMapPin, FiMessageSquare, FiClock, FiUser, FiAlertTriangle } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import LimitBanner from "@/components/LimitBanner";
 
 const statusStyle = {
   accepted: "bg-primary/10 text-primary",
@@ -53,6 +55,11 @@ const Interests = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { data: settings = {} } = usePlatformSettings();
+  const { interestCount, refetchInterests } = useDailyUsage();
+
+  const interestLimit = settings.daily_interests_limit ?? 0;
+  const interestLimitReached = interestLimit > 0 && interestCount >= interestLimit;
 
   const { data: received = [] } = useQuery({
     queryKey: ["interests-received", user?.id],
@@ -84,7 +91,6 @@ const Interests = () => {
   const { data: mutual = [] } = useQuery({
     queryKey: ["interests-mutual", user?.id],
     queryFn: async () => {
-      // Find accepted interests where user is involved
       const { data } = await supabase
         .from("interests")
         .select("*, from_profile:profiles!interests_from_user_id_fkey(*), to_profile:profiles!interests_to_user_id_fkey(*)")
@@ -117,6 +123,7 @@ const Interests = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["interests-sent"] });
+      refetchInterests();
       toast({ title: "Withdrawn", description: "Interest withdrawn successfully." });
     },
   });
@@ -129,6 +136,18 @@ const Interests = () => {
         </h1>
         <p className="page-subtitle">Manage your received, sent, and mutual interests.</p>
       </motion.div>
+
+      {/* Daily limit banner */}
+      {interestLimit > 0 && (
+        <LimitBanner label="Daily interests sent" used={interestCount} limit={interestLimit} icon={FiHeart} />
+      )}
+
+      {interestLimitReached && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs bg-destructive/10 text-destructive border border-destructive/30">
+          <FiAlertTriangle />
+          Daily interest limit ({interestLimit}) reached. You can still accept/decline received interests.
+        </div>
+      )}
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="grid grid-cols-3 gap-token-4">
         {[
