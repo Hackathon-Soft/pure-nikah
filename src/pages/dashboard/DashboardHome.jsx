@@ -6,11 +6,12 @@ import { Link } from "react-router-dom";
 import {
   FiUser, FiHeart, FiMessageSquare, FiShield,
   FiSearch, FiStar, FiAlertCircle, FiCheckCircle,
-  FiClock, FiEye, FiArrowRight,
+  FiClock, FiEye, FiArrowRight, FiZap, FiInfinity,
 } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
