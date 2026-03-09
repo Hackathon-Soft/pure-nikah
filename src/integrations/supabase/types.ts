@@ -139,6 +139,30 @@ export type Database = {
         }
         Relationships: []
       }
+      hidden_from_users: {
+        Row: {
+          created_at: string
+          hidden_email: string
+          hidden_user_id: string | null
+          id: string
+          profile_owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          hidden_email: string
+          hidden_user_id?: string | null
+          id?: string
+          profile_owner_id: string
+        }
+        Update: {
+          created_at?: string
+          hidden_email?: string
+          hidden_user_id?: string | null
+          id?: string
+          profile_owner_id?: string
+        }
+        Relationships: []
+      }
       interests: {
         Row: {
           created_at: string
