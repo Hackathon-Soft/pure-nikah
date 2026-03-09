@@ -58,6 +58,14 @@ const AdminUsers = () => {
     },
   });
 
+  const inPersonMutation = useMutation({
+    mutationFn: ({ userId, inPersonVerified }) => adminApi("in_person_verify_user", { userId, inPersonVerified }),
+    onSuccess: (_, { inPersonVerified }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast({ title: inPersonVerified ? "In-person verified ✓" : "In-person verification removed" });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: ({ userId }) => adminApi("delete_user", { userId }),
     onSuccess: () => {
