@@ -3,7 +3,7 @@ import {
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { FiHome, FiUsers, FiCheckCircle, FiAlertTriangle, FiSettings, FiHeart, FiBarChart2, FiMessageSquare } from "react-icons/fi";
+import { FiHome, FiUsers, FiCheckCircle, FiAlertTriangle, FiSettings, FiHeart, FiBarChart2, FiMessageSquare, FiBell } from "react-icons/fi";
 
 const items = [
   { title: "Overview", url: "/admin", icon: FiHome },
@@ -13,6 +13,7 @@ const items = [
   { title: "Analytics", url: "/admin/analytics", icon: FiBarChart2 },
   { title: "Success Stories", url: "/admin/success-stories", icon: FiHeart },
   { title: "Reports", url: "/admin/reports", icon: FiAlertTriangle },
+  { title: "Support & Safety", url: "/admin/support", icon: FiBell },
   { title: "Settings", url: "/admin/settings", icon: FiSettings },
 ];
 
