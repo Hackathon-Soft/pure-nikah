@@ -76,6 +76,11 @@ const QuickView = ({ profile, score }) => {
                         <FiShield className="mr-1" style={{ fontSize: "var(--text-xs)" }} /> Verified
                       </Badge>
                     )}
+                    {profile.inPersonVerified && (
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-0 dark:bg-blue-900/30 dark:text-blue-300">
+                        <FiCheckCircle className="mr-1" style={{ fontSize: "var(--text-xs)" }} /> In-Person Verified
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-muted-foreground text-token-sm mt-token-1">
                     {profile.age} years • {profile.gender} • {profile.maritalStatus}
