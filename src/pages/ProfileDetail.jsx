@@ -413,7 +413,7 @@ const FullView = ({
           </Tabs>
         </motion.div>
       </div>
-    </div>
+    </ProtectedContent>
   );
 };
 
