@@ -21,7 +21,7 @@ const FAQSection = () => (
         {faqs.map((faq, i) => (
           <AccordionItem key={i} value={`faq-${i}`} className="card-base px-token-6">
             <AccordionTrigger className="text-left font-display font-semibold text-foreground hover:no-underline">{faq.q}</AccordionTrigger>
-            <AccordionContent className="text-muted-foreground leading-token-relaxed">{faq.a}</AccordionContent>
+            <AccordionContent className="text-body-muted">{faq.a}</AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
