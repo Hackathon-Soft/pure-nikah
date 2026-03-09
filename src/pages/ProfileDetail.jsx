@@ -7,15 +7,17 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   FiShield, FiUser, FiMapPin, FiBookOpen, FiHeart, FiMessageSquare,
   FiStar, FiCamera, FiFlag, FiBriefcase, FiClock, FiCheckCircle,
-  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye, FiAlertTriangle,
+  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye, FiAlertTriangle, FiSend,
 } from "react-icons/fi";
 import { mockProfilesDB } from "@/lib/mockProfiles";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { CompatibilityBadge } from "@/components/CompatibilityBadge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import LimitBanner from "@/components/LimitBanner";
+import { toast } from "sonner";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
