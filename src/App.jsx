@@ -61,6 +61,7 @@ const AdminSettings       = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminSuccessStories = lazy(() => import("./pages/admin/AdminSuccessStories"));
 const AdminAnalytics        = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminContentModeration = lazy(() => import("./pages/admin/AdminContentModeration"));
+const AdminSupport          = lazy(() => import("./pages/admin/AdminSupport"));
 
 // Fallback spinner shown while lazy chunks load
 const PageLoader = () => (
