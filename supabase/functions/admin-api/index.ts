@@ -25,30 +25,26 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY") || "";
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error("Missing env vars:", { url: !!supabaseUrl, serviceKey: !!supabaseServiceKey, anonKey: !!supabaseAnonKey });
+      console.error("Missing env vars:", { url: !!supabaseUrl, serviceKey: !!supabaseServiceKey });
       return new Response(JSON.stringify({ error: "Server configuration error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Verify the calling user using their JWT
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
-      console.error("Auth error:", userError?.message);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Use service role client for admin operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check if user has admin role
     const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
@@ -57,7 +53,6 @@ Deno.serve(async (req) => {
       .single();
 
     if (roleError || !roleData) {
-      console.error("Role check failed:", roleError?.message, "user:", user.id);
       return new Response(JSON.stringify({ error: "Forbidden: Admin access required" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -72,21 +67,20 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case "get_stats": {
-        const [profiles, verified, banned, pendingReports, conversations, interests] = await Promise.all([
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const [profiles, verified, banned, pendingReports, conversations, interests, marriages, recentMarriagesRes, recentSignupsRes] = await Promise.all([
           adminClient.from("profiles").select("*", { count: "exact", head: true }),
           adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_verified", true),
           adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_banned", true),
           adminClient.from("reports").select("*", { count: "exact", head: true }).eq("status", "pending"),
           adminClient.from("conversations").select("*", { count: "exact", head: true }),
           adminClient.from("interests").select("*", { count: "exact", head: true }),
+          adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_married", true),
+          adminClient.from("profiles").select("*", { count: "exact", head: true }).eq("is_married", true).gte("updated_at", thirtyDaysAgo.toISOString()),
+          adminClient.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo.toISOString()),
         ]);
-
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const { count: recentSignups } = await adminClient
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", thirtyDaysAgo.toISOString());
 
         result = {
           totalProfiles: profiles.count || 0,
@@ -95,7 +89,9 @@ Deno.serve(async (req) => {
           pendingReports: pendingReports.count || 0,
           totalConversations: conversations.count || 0,
           totalInterests: interests.count || 0,
-          recentSignups: recentSignups || 0,
+          recentSignups: recentSignupsRes.count || 0,
+          totalMarriages: marriages.count || 0,
+          recentMarriages: recentMarriagesRes.count || 0,
         };
         break;
       }
@@ -114,11 +110,11 @@ Deno.serve(async (req) => {
         if (filter === "verified") query = query.eq("is_verified", true);
         if (filter === "banned") query = query.eq("is_banned", true);
         if (filter === "unverified") query = query.eq("is_verified", false);
+        if (filter === "married") query = query.eq("is_married", true);
 
         const { data, count, error } = await query;
         if (error) throw error;
 
-        // Get emails for listed users (batch)
         const usersWithEmail = [];
         for (const profile of data || []) {
           try {
@@ -159,9 +155,19 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "mark_married": {
+        const { userId, married } = params;
+        const { error } = await adminClient
+          .from("profiles")
+          .update({ is_married: married })
+          .eq("user_id", userId);
+        if (error) throw error;
+        result = { success: true, message: married ? "User marked as married — Mubarak!" : "Marriage status removed" };
+        break;
+      }
+
       case "delete_user": {
         const { userId } = params;
-        // Delete profile first (cascade should handle it, but be safe)
         await adminClient.from("profiles").delete().eq("user_id", userId);
         const { error } = await adminClient.auth.admin.deleteUser(userId);
         if (error) throw error;
