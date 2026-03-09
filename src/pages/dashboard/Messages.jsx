@@ -100,16 +100,31 @@ const Messages = () => {
 
   const sendMutation = useMutation({
     mutationFn: async (content) => {
-      const { error } = await supabase.from("messages").insert({
+      // Insert message first
+      const { data: newMessage, error } = await supabase.from("messages").insert({
         conversation_id: selected.id,
         sender_id: user.id,
         content,
-      });
+      }).select().single();
       if (error) throw error;
+      
+      // Update conversation
       await supabase.from("conversations").update({
         last_message: content,
         last_message_at: new Date().toISOString(),
       }).eq("id", selected.id);
+
+      // Trigger AI moderation in background (don't block on it)
+      supabase.functions.invoke("moderate-message", {
+        body: {
+          messageId: newMessage.id,
+          conversationId: selected.id,
+          senderId: user.id,
+          content,
+        },
+      }).catch(err => console.warn("Moderation check failed:", err));
+
+      return newMessage;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", selected?.id] });
