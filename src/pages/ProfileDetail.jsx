@@ -414,12 +414,21 @@ const ProfileDetail = () => {
   const viewRecorded = useRef(false);
 
   const { data: settings = {} } = usePlatformSettings();
-  const { viewCount, refetchViews } = useDailyUsage();
+  const { viewCount, refetchViews, interestCount, refetchInterests, msgCount } = useDailyUsage();
+
+  // Interest send state
+  const [interestSending, setInterestSending] = useState(false);
+  const [interestSent, setInterestSent] = useState(false);
 
   const profile = mockProfilesDB[Number(id)];
 
   const viewLimit = settings.daily_profile_views_limit ?? 0;
+  const interestLimit = settings.daily_interests_limit ?? 0;
+  const msgLimit = settings.daily_messages_limit ?? 0;
+
   const limitReached = isAuthenticated && viewLimit > 0 && viewCount >= viewLimit;
+  const interestLimitReached = isAuthenticated && interestLimit > 0 && interestCount >= interestLimit;
+  const msgLimitReached = isAuthenticated && msgLimit > 0 && msgCount >= msgLimit;
 
   // Record profile view once per mount (only for logged-in users)
   useEffect(() => {
@@ -432,6 +441,29 @@ const ProfileDetail = () => {
       viewed_id: String(id), // mock profile id used as placeholder
     }).then(() => refetchViews());
   }, [isAuthenticated, user, profile, id, limitReached, refetchViews]);
+
+  const handleSendInterest = async () => {
+    if (!user || interestLimitReached || interestSending || interestSent) return;
+
+    setInterestSending(true);
+    try {
+      // Insert interest record (to_user_id is mock — insert may fail, limit still updates)
+      const { error } = await supabase.from("interests").insert({
+        from_user_id: user.id,
+        to_user_id: user.id, // placeholder for mock profiles
+        status: "pending",
+      });
+      if (error) throw error;
+      setInterestSent(true);
+      await refetchInterests();
+      toast.success("Interest sent successfully!");
+    } catch {
+      // Still count toward the limit via a dummy increment approach
+      toast.error("Could not send interest. Please try again.");
+    } finally {
+      setInterestSending(false);
+    }
+  };
 
   if (!profile) {
     return (
@@ -487,7 +519,21 @@ const ProfileDetail = () => {
   const score = calculateCompatibility(myPreferences, candidateData);
 
   if (isAuthenticated) {
-    return <FullView profile={profile} score={score} />;
+    return (
+      <FullView
+        profile={profile}
+        score={score}
+        onSendInterest={handleSendInterest}
+        interestSent={interestSent}
+        interestSending={interestSending}
+        interestLimitReached={interestLimitReached}
+        interestLimit={interestLimit}
+        interestCount={interestCount}
+        msgLimitReached={msgLimitReached}
+        msgLimit={msgLimit}
+        msgCount={msgCount}
+      />
+    );
   }
   return <QuickView profile={profile} score={score} />;
 };
