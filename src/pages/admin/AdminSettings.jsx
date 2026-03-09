@@ -160,7 +160,7 @@ const AdminSettings = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <Label className="text-xs text-muted-foreground mb-1.5 block">Value</Label>
