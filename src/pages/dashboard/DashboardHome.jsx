@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
+import NoticeBanner from "@/components/notices/NoticeBanner";
 
 const DashboardHome = () => {
   const { user, profile } = useAuth();
