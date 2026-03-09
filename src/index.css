@@ -875,4 +875,35 @@
   .gap-section {
     gap: var(--space-14);
   }
+
+  /* ── Content Protection (anti-screenshot deterrents) ── */
+  .protected-content {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    pointer-events: auto;
+  }
+
+  .protected-content img,
+  .protected-content canvas {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+  }
+
+  .protected-content::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    pointer-events: none;
+  }
 }

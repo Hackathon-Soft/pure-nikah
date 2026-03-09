@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 import LimitBanner from "@/components/LimitBanner";
 import { toast } from "sonner";
+import { ProtectedContent } from "@/components/protection/ContentProtection";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",
@@ -230,7 +231,7 @@ const FullView = ({
   };
 
   return (
-    <div className="min-h-screen bg-muted islamic-pattern">
+    <ProtectedContent className="min-h-screen bg-muted islamic-pattern">
       <div className="app-container py-token-10 max-w-4xl">
         {/* Back */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-token-6">
@@ -412,7 +413,7 @@ const FullView = ({
           </Tabs>
         </motion.div>
       </div>
-    </div>
+    </ProtectedContent>
   );
 };
 

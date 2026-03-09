@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { ProtectedContent } from "@/components/protection/ContentProtection";
 
 const cities = ["Any", "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Sialkot", "Gujranwala", "Hyderabad", "Bahawalpur"];
 const countries = ["Any", "Pakistan", "UK", "USA", "Canada", "UAE", "Saudi Arabia", "Australia", "Germany"];
@@ -477,7 +478,7 @@ const SearchPage = () => {
                 )}
               </div>
             ) : (
-              <div className="grid-3col">
+              <ProtectedContent className="grid-3col">
                 {withScores.map((p, i) => (
                   <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(0.05 * i, 0.5) }}>
                     <Card className="card-profile">
@@ -528,7 +529,7 @@ const SearchPage = () => {
                     </Card>
                   </motion.div>
                 ))}
-              </div>
+              </ProtectedContent>
             )}
           </>
         )}
