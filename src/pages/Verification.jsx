@@ -6,16 +6,21 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { FiShield, FiUpload, FiCheckCircle, FiClock, FiAlertCircle, FiUser, FiCamera } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi";
 
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 const verificationSchema = yup.object({
   cnicNumber: yup.string().matches(/^\d{5}-\d{7}-\d{1}$/, "CNIC must be in format: 12345-1234567-1").required("CNIC number is required"),
-  fullName: yup.string().min(3, "Full name as per CNIC").max(100).required("Full name is required"),
-  fatherName: yup.string().min(3, "Father name as per CNIC").max(100).required("Father name is required"),
+  fullName: yup.string().trim().min(3, "Full name as per CNIC").max(100).required("Full name is required"),
+  fatherName: yup.string().trim().min(3, "Father name as per CNIC").max(100).required("Father name is required"),
   dateOfBirth: yup.string().min(1, "Date of birth is required").required("Date of birth is required"),
-  address: yup.string().min(10, "Provide full address as per CNIC").max(300).required("Address is required"),
+  address: yup.string().trim().min(10, "Provide full address as per CNIC").max(300).required("Address is required"),
   phoneNumber: yup.string().matches(/^(\+92|0)\d{10}$/, "Enter valid Pakistani phone number").required("Phone number is required"),
 });
 
@@ -27,20 +32,145 @@ const statusConfig = {
   expired: { icon: <FiClock style={{ fontSize: "var(--size-icon-xl)" }} />, label: "Expired – Re-verify", color: "text-accent-foreground", bg: "bg-accent/20" },
 };
 
+const normalizeVerificationStatus = (dbStatus) => {
+  if (dbStatus === "approved") return "verified";
+  if (dbStatus === "pending") return "pending";
+  if (dbStatus === "rejected") return "rejected";
+  if (dbStatus === "expired") return "expired";
+  return "not_submitted";
+};
+
+const sanitizeFilename = (name) => name.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
+
 const Verification = () => {
+  const { user } = useAuth();
   const [status, setStatus] = useState("not_submitted");
   const [cnicFront, setCnicFront] = useState(null);
   const [cnicBack, setCnicBack] = useState(null);
   const [selfie, setSelfie] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   const { toast } = useToast();
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ resolver: yupResolver(verificationSchema) });
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: yupResolver(verificationSchema),
+  });
 
-  const onSubmit = (_data) => {
-    if (!cnicFront || !cnicBack) { toast({ title: "Missing documents", description: "Please upload both sides of your CNIC.", variant: "destructive" }); return; }
-    if (!selfie) { toast({ title: "Selfie required", description: "Please upload a selfie holding your CNIC.", variant: "destructive" }); return; }
-    setStatus("pending");
-    toast({ title: "Submitted", description: "Your verification is under review. We'll notify you within 24-48 hours." });
+  useEffect(() => {
+    const fetchVerificationStatus = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("verification_requests")
+        .select("status,rejection_reason")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        setStatus(normalizeVerificationStatus(data.status));
+        setRejectionReason(data.rejection_reason || "");
+      }
+    };
+
+    fetchVerificationStatus();
+  }, [user]);
+
+  const validateFile = (file, label) => {
+    if (!file) return false;
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast({ title: "Invalid file type", description: `${label} must be JPG, PNG, or WEBP.`, variant: "destructive" });
+      return false;
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast({ title: "File too large", description: `${label} must be 5MB or smaller.`, variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
+  const uploadVerificationFile = async (file, kind) => {
+    const safeName = sanitizeFilename(file.name);
+    const path = `${user.id}/${Date.now()}-${kind}-${safeName}`;
+
+    const { error } = await supabase.storage
+      .from("verification-docs")
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    if (error) throw error;
+    return path;
+  };
+
+  const onSubmit = async (formData) => {
+    if (!user) {
+      toast({ title: "Please log in", description: "You must be logged in to submit verification.", variant: "destructive" });
+      return;
+    }
+
+    if (!cnicFront || !cnicBack) {
+      toast({ title: "Missing documents", description: "Please upload both sides of your CNIC.", variant: "destructive" });
+      return;
+    }
+
+    if (!selfie) {
+      toast({ title: "Selfie required", description: "Please upload a selfie holding your CNIC.", variant: "destructive" });
+      return;
+    }
+
+    if (!validateFile(cnicFront, "CNIC front") || !validateFile(cnicBack, "CNIC back") || !validateFile(selfie, "Selfie")) {
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+
+      const { data: latestRequest } = await supabase
+        .from("verification_requests")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const [cnicFrontPath, cnicBackPath, selfiePath] = await Promise.all([
+        uploadVerificationFile(cnicFront, "cnic-front"),
+        uploadVerificationFile(cnicBack, "cnic-back"),
+        uploadVerificationFile(selfie, "selfie"),
+      ]);
+
+      const payload = {
+        user_id: user.id,
+        cnic_number: formData.cnicNumber,
+        full_name: formData.fullName,
+        father_name: formData.fatherName,
+        date_of_birth: formData.dateOfBirth,
+        address: formData.address,
+        phone_number: formData.phoneNumber,
+        cnic_front_path: cnicFrontPath,
+        cnic_back_path: cnicBackPath,
+        selfie_path: selfiePath,
+        status: "pending",
+        rejection_reason: null,
+        reviewed_at: null,
+        reviewed_by: null,
+      };
+
+      const mutation = latestRequest?.id
+        ? supabase.from("verification_requests").update(payload).eq("id", latestRequest.id)
+        : supabase.from("verification_requests").insert(payload);
+
+      const { error } = await mutation;
+      if (error) throw error;
+
+      setStatus("pending");
+      setRejectionReason("");
+      toast({ title: "Submitted", description: "Your verification is under review. We'll notify you within 24-48 hours." });
+    } catch (error) {
+      toast({ title: "Submission failed", description: error.message || "Please try again.", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const sConfig = statusConfig[status];
@@ -52,6 +182,7 @@ const Verification = () => {
         <h1 className="page-title mb-token-2">Identity Verification</h1>
         <p className="text-muted-foreground mb-token-8">Verify your identity to build trust and prevent spam. Verification is reviewed by our team and expires every 6 months.</p>
       </motion.div>
+
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={`${sConfig.bg} rounded-xl p-token-6 mb-token-8 flex items-center gap-token-4`}>
         <div className={sConfig.color}>{sConfig.icon}</div>
         <div>
@@ -63,16 +194,29 @@ const Verification = () => {
             {status === "rejected" && "Your verification was rejected. Please re-submit with correct documents."}
             {status === "expired" && "Your verification has expired. Please re-verify to maintain your verified status."}
           </p>
+          {status === "rejected" && rejectionReason && (
+            <p className="text-token-xs text-destructive mt-token-2">Reason: {rejectionReason}</p>
+          )}
         </div>
       </motion.div>
+
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="card-base p-token-6 mb-token-8">
         <h2 className="card-section-title text-token-xl mb-token-4">How Verification Works</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-token-4">
-          {[{ icon: <HiOutlineIdentification style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Submit CNIC", desc: "Upload front & back of your CNIC/ID card" },{ icon: <FiCamera style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Take Selfie", desc: "Selfie holding your CNIC for verification" },{ icon: <FiUser style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Human Review", desc: "Our team verifies within 24-48 hours" }].map((step, i) => (
-            <div key={i} className="text-center p-token-4"><div className="icon-box w-12 h-12 rounded-full mx-auto mb-token-3"><span className="text-primary">{step.icon}</span></div><h4 className="font-display text-token-sm font-semibold text-foreground">{step.title}</h4><p className="text-token-xs text-muted-foreground mt-token-1">{step.desc}</p></div>
+          {[
+            { icon: <HiOutlineIdentification style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Submit CNIC", desc: "Upload front & back of your CNIC/ID card" },
+            { icon: <FiCamera style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Take Selfie", desc: "Selfie holding your CNIC for verification" },
+            { icon: <FiUser style={{ fontSize: "var(--size-icon-lg)" }} />, title: "Human Review", desc: "Our team verifies within 24-48 hours" },
+          ].map((step, i) => (
+            <div key={i} className="text-center p-token-4">
+              <div className="icon-box w-12 h-12 rounded-full mx-auto mb-token-3"><span className="text-primary">{step.icon}</span></div>
+              <h4 className="font-display text-token-sm font-semibold text-foreground">{step.title}</h4>
+              <p className="text-token-xs text-muted-foreground mt-token-1">{step.desc}</p>
+            </div>
           ))}
         </div>
       </motion.div>
+
       {canSubmit && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card-base p-token-6">
           <h2 className="card-section-title text-token-xl mb-token-6">Submit Your Documents</h2>
@@ -85,15 +229,16 @@ const Verification = () => {
               <div><Label htmlFor="phoneNumber">Phone Number</Label><Input id="phoneNumber" placeholder="+923001234567" {...register("phoneNumber")} className="mt-token-1" />{errors.phoneNumber && <p className="form-error">{errors.phoneNumber.message}</p>}</div>
             </div>
             <div><Label htmlFor="address">Address (as per CNIC)</Label><Input id="address" placeholder="House #, Street, City, Province" {...register("address")} className="mt-token-1" />{errors.address && <p className="form-error">{errors.address.message}</p>}</div>
+
             <div className="border-t border-border pt-token-5">
               <h3 className="card-section-title mb-token-4">Document Uploads</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-token-4 mb-token-4">
                 <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-token-6 cursor-pointer transition-colors ${cnicFront ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
-                  <FiUpload className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{cnicFront ? cnicFront.name : "CNIC Front"}</span><span className="text-token-xs text-muted-foreground mt-token-1">JPG, PNG (max 5MB)</span>
+                  <FiUpload className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{cnicFront ? cnicFront.name : "CNIC Front"}</span><span className="text-token-xs text-muted-foreground mt-token-1">JPG, PNG, WEBP (max 5MB)</span>
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => setCnicFront(e.target.files?.[0] || null)} />
                 </label>
                 <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-token-6 cursor-pointer transition-colors ${cnicBack ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
-                  <FiUpload className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{cnicBack ? cnicBack.name : "CNIC Back"}</span><span className="text-token-xs text-muted-foreground mt-token-1">JPG, PNG (max 5MB)</span>
+                  <FiUpload className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{cnicBack ? cnicBack.name : "CNIC Back"}</span><span className="text-token-xs text-muted-foreground mt-token-1">JPG, PNG, WEBP (max 5MB)</span>
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => setCnicBack(e.target.files?.[0] || null)} />
                 </label>
               </div>
@@ -102,11 +247,16 @@ const Verification = () => {
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => setSelfie(e.target.files?.[0] || null)} />
               </label>
             </div>
+
             <div className="bg-muted rounded-xl p-token-4 flex gap-token-3">
               <FiShield className="text-primary flex-shrink-0 mt-0.5" style={{ fontSize: "var(--size-icon)" }} />
               <div><p className="text-token-xs text-muted-foreground"><strong className="text-foreground">Privacy:</strong> Your documents are encrypted and only used for verification. They are never shared with other users. Verification expires every 6 months to keep profiles authentic.</p></div>
             </div>
-            <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}><FiShield className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} />Submit for Verification</Button>
+
+            <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting || isUploading}>
+              <FiShield className="mr-token-2" style={{ fontSize: "var(--size-icon)" }} />
+              {isUploading ? "Uploading documents..." : "Submit for Verification"}
+            </Button>
           </form>
         </motion.div>
       )}

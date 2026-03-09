@@ -480,6 +480,66 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          address: string
+          cnic_back_path: string
+          cnic_front_path: string
+          cnic_number: string
+          created_at: string
+          date_of_birth: string
+          father_name: string
+          full_name: string
+          id: string
+          phone_number: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          selfie_path: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          cnic_back_path: string
+          cnic_front_path: string
+          cnic_number: string
+          created_at?: string
+          date_of_birth: string
+          father_name: string
+          full_name: string
+          id?: string
+          phone_number: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_path: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          cnic_back_path?: string
+          cnic_front_path?: string
+          cnic_number?: string
+          created_at?: string
+          date_of_birth?: string
+          father_name?: string
+          full_name?: string
+          id?: string
+          phone_number?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_path?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
