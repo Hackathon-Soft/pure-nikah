@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import PhoneVerification from "@/components/verification/PhoneVerification";
 
 const Settings = () => {
   const { signOut, user, profile, fetchProfile } = useAuth();
