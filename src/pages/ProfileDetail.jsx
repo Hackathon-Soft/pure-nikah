@@ -166,7 +166,12 @@ const QuickView = ({ profile, score }) => {
 };
 
 // ─── Full View (Logged In) ───
-const FullView = ({ profile, score }) => {
+const FullView = ({
+  profile, score,
+  onSendInterest, interestSent, interestSending,
+  interestLimitReached, interestLimit, interestCount,
+  msgLimitReached, msgLimit, msgCount,
+}) => {
   const candidateData = {
     age: profile.age, city: profile.city, sect: profile.sect?.split(" ")[0],
     cast: profile.cast, education: profile.education?.split(" ")[0],
@@ -229,6 +234,16 @@ const FullView = ({ profile, score }) => {
           </Link>
         </motion.div>
 
+        {/* Limit banners */}
+        <div className="space-y-2 mb-token-4">
+          {interestLimit > 0 && (
+            <LimitBanner label="Interests sent" used={interestCount} limit={interestLimit} icon={FiHeart} />
+          )}
+          {msgLimit > 0 && (
+            <LimitBanner label="Messages sent" used={msgCount} limit={msgLimit} icon={FiMessageSquare} />
+          )}
+        </div>
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card>
@@ -274,12 +289,56 @@ const FullView = ({ profile, score }) => {
                     <span className="flex items-center gap-token-1"><FiClock style={{ fontSize: "var(--text-xs)" }} /> Active {profile.lastActive}</span>
                     <span>• Since {profile.memberSince}</span>
                   </div>
+
+                  {/* Action buttons */}
                   <div className="flex items-center justify-center sm:justify-start gap-token-3 mt-token-4 flex-wrap">
-                    <Button variant="hero" size="sm"><FiHeart className="mr-1" /> Send Interest</Button>
-                    <Button variant="outline" size="sm"><FiMessageSquare className="mr-1" /> Message</Button>
+                    <Button
+                      variant={interestSent ? "outline" : "hero"}
+                      size="sm"
+                      onClick={onSendInterest}
+                      disabled={interestLimitReached || interestSending || interestSent}
+                      title={interestLimitReached ? `Daily limit of ${interestLimit} interests reached` : undefined}
+                    >
+                      {interestSending ? (
+                        <><FiHeart className="mr-1 animate-pulse" /> Sending…</>
+                      ) : interestSent ? (
+                        <><FiCheckCircle className="mr-1 text-primary" /> Interest Sent</>
+                      ) : (
+                        <><FiHeart className="mr-1" /> Send Interest</>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={msgLimitReached}
+                      title={msgLimitReached ? `Daily message limit of ${msgLimit} reached` : undefined}
+                      asChild={!msgLimitReached}
+                    >
+                      {msgLimitReached ? (
+                        <span className="flex items-center gap-1 opacity-60"><FiMessageSquare className="mr-1" /> Message</span>
+                      ) : (
+                        <Link to="/dashboard/messages"><FiMessageSquare className="mr-1" /> Message</Link>
+                      )}
+                    </Button>
+
                     <Button variant="outline" size="sm"><FiStar className="mr-1" /> Favorite</Button>
                     <Button variant="ghost" size="sm" className="text-muted-foreground"><FiFlag className="mr-1" /> Report</Button>
                   </div>
+
+                  {/* Inline warnings */}
+                  {interestLimitReached && (
+                    <div className="mt-token-3 flex items-center gap-2 text-xs text-destructive">
+                      <FiAlertTriangle className="flex-shrink-0" />
+                      Daily interest limit ({interestLimit}) reached. Come back tomorrow.
+                    </div>
+                  )}
+                  {msgLimitReached && (
+                    <div className="mt-token-2 flex items-center gap-2 text-xs text-destructive">
+                      <FiAlertTriangle className="flex-shrink-0" />
+                      Daily message limit ({msgLimit}) reached. Come back tomorrow.
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
