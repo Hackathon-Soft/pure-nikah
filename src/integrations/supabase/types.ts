@@ -423,6 +423,42 @@ export type Database = {
         }
         Relationships: []
       }
+      success_stories: {
+        Row: {
+          couple_names: string
+          created_at: string
+          id: string
+          is_approved: boolean
+          location: string | null
+          rating: number | null
+          review: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          couple_names: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          rating?: number | null
+          review: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          couple_names?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          rating?: number | null
+          review?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
