@@ -155,6 +155,38 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "review_verification_request": {
+        const { requestId, userId, approved, rejectionReason } = params;
+        if (!requestId || !userId || typeof approved !== "boolean") {
+          throw new Error("requestId, userId and approved are required");
+        }
+
+        const newStatus = approved ? "approved" : "rejected";
+
+        const { error: requestError } = await adminClient
+          .from("verification_requests")
+          .update({
+            status: newStatus,
+            rejection_reason: approved ? null : (rejectionReason || null),
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.id,
+          })
+          .eq("id", requestId)
+          .eq("user_id", userId);
+
+        if (requestError) throw requestError;
+
+        const { error: profileError } = await adminClient
+          .from("profiles")
+          .update({ is_verified: approved })
+          .eq("user_id", userId);
+
+        if (profileError) throw profileError;
+
+        result = { success: true, message: approved ? "Verification approved" : "Verification rejected" };
+        break;
+      }
+
       case "mark_married": {
         const { userId, married } = params;
         const { error } = await adminClient
@@ -176,24 +208,53 @@ Deno.serve(async (req) => {
       }
 
       case "list_verification_requests": {
-        const { data, error } = await adminClient
-          .from("profiles")
+        const { data: requestRows, error } = await adminClient
+          .from("verification_requests")
           .select("*")
-          .eq("is_verified", false)
-          .eq("profile_completed", true)
+          .eq("status", "pending")
           .order("created_at", { ascending: false });
+
         if (error) throw error;
 
-        const withEmail = [];
-        for (const profile of data || []) {
+        const userIds = [...new Set((requestRows || []).map((row) => row.user_id))];
+
+        const { data: profileRows } = userIds.length
+          ? await adminClient
+              .from("profiles")
+              .select("user_id,first_name,last_name,city,gender,education,profession")
+              .in("user_id", userIds)
+          : { data: [] };
+
+        const profileByUserId = new Map((profileRows || []).map((profile) => [profile.user_id, profile]));
+
+        const requests = await Promise.all((requestRows || []).map(async (request) => {
+          const profile = profileByUserId.get(request.user_id) || {};
+
+          let email = "N/A";
           try {
-            const { data: authData } = await adminClient.auth.admin.getUserById(profile.user_id);
-            withEmail.push({ ...profile, email: authData?.user?.email || "N/A" });
+            const { data: authData } = await adminClient.auth.admin.getUserById(request.user_id);
+            email = authData?.user?.email || "N/A";
           } catch {
-            withEmail.push({ ...profile, email: "N/A" });
+            email = "N/A";
           }
-        }
-        result = { requests: withEmail };
+
+          const [frontRes, backRes, selfieRes] = await Promise.all([
+            adminClient.storage.from("verification-docs").createSignedUrl(request.cnic_front_path, 3600),
+            adminClient.storage.from("verification-docs").createSignedUrl(request.cnic_back_path, 3600),
+            adminClient.storage.from("verification-docs").createSignedUrl(request.selfie_path, 3600),
+          ]);
+
+          return {
+            ...request,
+            ...profile,
+            email,
+            cnic_front_url: frontRes.data?.signedUrl || null,
+            cnic_back_url: backRes.data?.signedUrl || null,
+            selfie_url: selfieRes.data?.signedUrl || null,
+          };
+        }));
+
+        result = { requests };
         break;
       }
 
