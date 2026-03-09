@@ -231,7 +231,7 @@ const FullView = ({
   };
 
   return (
-    <div className="min-h-screen bg-muted islamic-pattern">
+    <ProtectedContent className="min-h-screen bg-muted islamic-pattern">
       <div className="app-container py-token-10 max-w-4xl">
         {/* Back */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-token-6">
