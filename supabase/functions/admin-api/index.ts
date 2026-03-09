@@ -255,6 +255,39 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // Success Stories Management
+      case "list_success_stories": {
+        const { data, error } = await adminClient
+          .from("success_stories")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        result = { stories: data || [] };
+        break;
+      }
+
+      case "approve_story": {
+        const { storyId } = params;
+        const { error } = await adminClient
+          .from("success_stories")
+          .update({ is_approved: true })
+          .eq("id", storyId);
+        if (error) throw error;
+        result = { success: true, message: "Story approved and is now live!" };
+        break;
+      }
+
+      case "delete_story": {
+        const { storyId } = params;
+        const { error } = await adminClient
+          .from("success_stories")
+          .delete()
+          .eq("id", storyId);
+        if (error) throw error;
+        result = { success: true, message: "Story deleted" };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
           status: 400,
