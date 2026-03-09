@@ -7,18 +7,15 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   FiShield, FiUser, FiMapPin, FiBookOpen, FiHeart, FiMessageSquare,
   FiStar, FiCamera, FiFlag, FiBriefcase, FiClock, FiCheckCircle,
-  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye,
+  FiCalendar, FiGlobe, FiHome, FiUsers, FiLock, FiArrowLeft, FiEye, FiAlertTriangle,
 } from "react-icons/fi";
 import { mockProfilesDB } from "@/lib/mockProfiles";
 import { calculateCompatibility } from "@/lib/compatibility";
 import { CompatibilityBadge } from "@/components/CompatibilityBadge";
-
-// Simulated auth — replace with real auth later
-const useAuth = () => {
-  // Check a simple flag for demo purposes
-  const isLoggedIn = localStorage.getItem("purenikah_demo_auth") === "true";
-  return { isLoggedIn };
-};
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useRef } from "react";
+import { usePlatformSettings, useDailyUsage } from "@/hooks/usePlatformLimits";
 
 const myPreferences = {
   ageMin: 22, ageMax: 30, city: "Lahore", sect: "Sunni", cast: "Any",

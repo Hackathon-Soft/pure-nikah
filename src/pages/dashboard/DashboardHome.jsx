@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import {
   FiUser, FiHeart, FiMessageSquare, FiShield,
   FiSearch, FiStar, FiAlertCircle, FiCheckCircle,
-  FiClock, FiEye, FiArrowRight, FiZap, FiInfinity,
+  FiClock, FiEye, FiArrowRight, FiZap,
 } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
