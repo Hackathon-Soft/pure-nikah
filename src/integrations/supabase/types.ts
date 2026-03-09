@@ -139,6 +139,30 @@ export type Database = {
         }
         Relationships: []
       }
+      hidden_from_users: {
+        Row: {
+          created_at: string
+          hidden_email: string
+          hidden_user_id: string | null
+          id: string
+          profile_owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          hidden_email: string
+          hidden_user_id?: string | null
+          id?: string
+          profile_owner_id: string
+        }
+        Update: {
+          created_at?: string
+          hidden_email?: string
+          hidden_user_id?: string | null
+          id?: string
+          profile_owner_id?: string
+        }
+        Relationships: []
+      }
       interests: {
         Row: {
           created_at: string
@@ -671,6 +695,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wali_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          invited_by: string
+          status: string
+          wali_email: string
+          wali_user_id: string | null
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          invited_by: string
+          status?: string
+          wali_email: string
+          wali_user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string
+          status?: string
+          wali_email?: string
+          wali_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
