@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import {
   FiUser, FiHeart, FiMessageSquare, FiShield,
   FiSearch, FiStar, FiAlertCircle, FiCheckCircle,
-  FiClock, FiEye, FiArrowRight, FiZap, FiInfinity,
+  FiClock, FiEye, FiArrowRight, FiZap,
 } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -193,7 +193,7 @@ const DashboardHome = () => {
                     <div className="flex items-center justify-between">
                       <Icon className={`text-sm ${color}`} />
                       {unlimited
-                        ? <FiInfinity className="text-xs text-muted-foreground" title="Unlimited" />
+                        ? <span className="text-xs text-muted-foreground font-bold" title="Unlimited">∞</span>
                         : <span className={`text-xs font-semibold ${exceeded ? "text-destructive" : nearLimit ? "text-amber-500" : "text-muted-foreground"}`}>
                             {used}/{limit}
                           </span>}
