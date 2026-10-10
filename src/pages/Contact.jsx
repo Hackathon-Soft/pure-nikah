@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const contactMethods = [
   { icon: FiMail, label: "Email", value: "support@purenikah.com", href: "mailto:support@purenikah.com" },
@@ -32,6 +34,7 @@ const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,9 +43,18 @@ const Contact = () => {
       return;
     }
     setSubmitting(true);
-    // Simulate submission (in production, this would send to a backend or email service)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await supabase.from("contact_messages").insert({
+      user_id: user?.id || null,
+      name: form.name.trim(),
+      email: form.email.trim().toLowerCase(),
+      topic: form.topic,
+      message: form.message.trim(),
+    });
     setSubmitting(false);
+    if (error) {
+      toast({ title: "Unable to send message", description: error.message, variant: "destructive" });
+      return;
+    }
     setSubmitted(true);
     toast({ title: "Message sent!", description: "We'll get back to you soon, InshaAllah." });
   };

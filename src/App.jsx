@@ -32,6 +32,7 @@ import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 import ProfileDetail from "./pages/ProfileDetail";
 import Contact from "./pages/Contact";
+import SEO from "./components/SEO";
 
 // Verification status pages
 import VerificationPending from "./pages/VerificationPending";
@@ -51,6 +52,8 @@ const Settings          = lazy(() => import("./pages/dashboard/Settings"));
 const WhoViewedMe       = lazy(() => import("./pages/dashboard/WhoViewedMe"));
 const Photos            = lazy(() => import("./pages/dashboard/Photos"));
 const BlockedUsers      = lazy(() => import("./pages/dashboard/BlockedUsers"));
+const NearbyMatches     = lazy(() => import("./pages/dashboard/NearbyMatches"));
+const PhoneVerificationPage = lazy(() => import("./pages/dashboard/PhoneVerificationPage"));
 
 // Admin pages — lazy loaded
 const AdminDashboard      = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -79,6 +82,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <SEO />
           <Routes>
             {/* Public pages with Navbar + Footer */}
             <Route element={<PublicLayout />}>
@@ -117,7 +121,8 @@ const App = () => (
               <Route path="photos" element={<Suspense fallback={<PageLoader />}><Photos /></Suspense>} />
               <Route path="preferences" element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>} />
               <Route path="search" element={<Suspense fallback={<PageLoader />}><Search /></Suspense>} />
-              <Route path="nearby" element={<Suspense fallback={<PageLoader />}><Search /></Suspense>} />
+              <Route path="nearby" element={<Suspense fallback={<PageLoader />}><NearbyMatches /></Suspense>} />
+              <Route path="phone-verification" element={<Suspense fallback={<PageLoader />}><PhoneVerificationPage /></Suspense>} />
               <Route path="interests" element={<Suspense fallback={<PageLoader />}><Interests /></Suspense>} />
               <Route path="favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
               <Route path="messages" element={<Suspense fallback={<PageLoader />}><Messages /></Suspense>} />
