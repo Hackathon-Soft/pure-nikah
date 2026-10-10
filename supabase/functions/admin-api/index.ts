@@ -5,6 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+type Row = Record<string, unknown>;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -310,7 +311,7 @@ Deno.serve(async (req) => {
           email: authData.data?.user?.email,
           last_sign_in: authData.data?.user?.last_sign_in_at,
           created_at: authData.data?.user?.created_at,
-          roles: (roles.data || []).map((r: any) => r.role),
+          roles: (roles.data || []).map((r: Row) => r.role),
           reportsCount: reportsAgainst.count || 0,
         };
         break;
@@ -376,7 +377,7 @@ Deno.serve(async (req) => {
 
         // Gender distribution
         const genderMap: Record<string, number> = {};
-        profiles.forEach((p: any) => {
+        profiles.forEach((p: Row) => {
           const g = p.gender === "male" ? "Male" : p.gender === "female" ? "Female" : "Other";
           genderMap[g] = (genderMap[g] || 0) + 1;
         });
@@ -384,8 +385,8 @@ Deno.serve(async (req) => {
 
         // Top cities
         const cityMap: Record<string, number> = {};
-        profiles.forEach((p: any) => {
-          if (p.city) cityMap[p.city] = (cityMap[p.city] || 0) + 1;
+        profiles.forEach((p: Row) => {
+          if (typeof p.city === "string" && p.city) cityMap[p.city] = (cityMap[p.city] || 0) + 1;
         });
         const topCities = Object.entries(cityMap)
           .sort((a, b) => b[1] - a[1])
@@ -394,15 +395,15 @@ Deno.serve(async (req) => {
 
         // Sect distribution
         const sectMap: Record<string, number> = {};
-        profiles.forEach((p: any) => {
-          if (p.sect) sectMap[p.sect] = (sectMap[p.sect] || 0) + 1;
+        profiles.forEach((p: Row) => {
+          if (typeof p.sect === "string" && p.sect) sectMap[p.sect] = (sectMap[p.sect] || 0) + 1;
         });
         const sectDistribution = Object.entries(sectMap).map(([name, value]) => ({ name, value }));
 
         // Marital status
         const maritalMap: Record<string, number> = {};
-        profiles.forEach((p: any) => {
-          const ms = p.marital_status || "Unknown";
+        profiles.forEach((p: Row) => {
+          const ms = typeof p.marital_status === "string" ? p.marital_status : "Unknown";
           const label = ms.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
           maritalMap[label] = (maritalMap[label] || 0) + 1;
         });
@@ -416,7 +417,7 @@ Deno.serve(async (req) => {
           const monthName = d.toLocaleString("default", { month: "short", year: "2-digit" });
           const start = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
           const end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59).toISOString();
-          const count = profiles.filter((p: any) => p.created_at >= start && p.created_at <= end).length;
+          const count = profiles.filter((p: Row) => typeof p.created_at === "string" && p.created_at >= start && p.created_at <= end).length;
           monthlySignups.push({ month: monthName, count });
         }
 
@@ -582,8 +583,8 @@ Deno.serve(async (req) => {
           .not("caste", "is", null);
         if (error) throw error;
         const casteCount: Record<string, number> = {};
-        (profiles || []).forEach((p: any) => {
-          if (p.caste) casteCount[p.caste] = (casteCount[p.caste] || 0) + 1;
+        (profiles || []).forEach((p: Row) => {
+          if (typeof p.caste === "string" && p.caste) casteCount[p.caste] = (casteCount[p.caste] || 0) + 1;
         });
         const casteTrends = Object.entries(casteCount)
           .map(([name, count]) => ({ name, count }))
