@@ -1,1 +1,3 @@
-ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_user_id_fkey;
+-- Keep the profiles.user_id foreign key to auth.users.
+-- This migration is intentionally a no-op; an earlier draft removed
+-- referential integrity and caused orphaned profile rows.
