@@ -48,16 +48,13 @@ const Register = () => {
     const { error } = await signUp(data.email, data.password, {
       name: data.name,
       gender: data.gender,
+      registration_type: data.registrationType,
+      registered_by_name: data.registeredByName || null,
+      registered_by_relation: data.registeredByRelation || null,
     });
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      // Store family registration info in localStorage to apply after profile creation
-      if (data.registrationType !== "self") {
-        localStorage.setItem("pn_registration_type", data.registrationType);
-        localStorage.setItem("pn_registered_by_name", data.registeredByName || "");
-        localStorage.setItem("pn_registered_by_relation", data.registeredByRelation || "");
-      }
       toast({ title: "Account created!", description: "Please check your email to verify your account." });
       navigate("/verify-email", { state: { email: data?.user?.email || data.email } });
     }
@@ -122,12 +119,12 @@ const Register = () => {
 
         <div>
           <Label htmlFor="name">{registrationType === "self" ? "Full Name" : `${registrationType.charAt(0).toUpperCase() + registrationType.slice(1)}'s Full Name`}</Label>
-          <Input id="name" placeholder={registrationType === "self" ? "Your full name" : `Your ${registrationType}'s full name`} {...register("name")} className="mt-token-1" />
+          <Input id="name" autoComplete="name" placeholder={registrationType === "self" ? "Your full name" : `Your ${registrationType}'s full name`} {...register("name")} className="mt-token-1" />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
         </div>
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
+          <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
           {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
         <div>
@@ -143,8 +140,8 @@ const Register = () => {
         <div>
           <Label htmlFor="password">Password</Label>
           <div className="relative mt-token-1">
-            <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters" {...register("password")} />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">
+            <Input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Min 8 characters" {...register("password")} />
+            <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(!showPassword)} className="password-toggle">
               {showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}
             </button>
           </div>
@@ -152,7 +149,7 @@ const Register = () => {
         </div>
         <div>
           <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input id="confirmPassword" type="password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />
+          <Input id="confirmPassword" type="password" autoComplete="new-password" placeholder="Repeat password" {...register("confirmPassword")} className="mt-token-1" />
           {errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}
         </div>
         <Button variant="hero" size="lg" type="submit" className="w-full" disabled={isSubmitting}>
