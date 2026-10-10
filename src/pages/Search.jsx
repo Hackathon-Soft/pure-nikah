@@ -24,6 +24,7 @@ import { ProtectedContent } from "@/components/protection/ContentProtection";
 import { getDisplayName } from "@/lib/displayName.js";
 
 const cities = ["Any", "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Sialkot", "Gujranwala", "Hyderabad", "Bahawalpur"];
+const states = ["Any", "Punjab", "Sindh", "Khyber Pakhtunkhwa", "Balochistan", "Islamabad", "Azad Jammu and Kashmir", "Gilgit-Baltistan"];
 const countries = ["Any", "Pakistan", "UK", "USA", "Canada", "UAE", "Saudi Arabia", "Australia", "Germany"];
 const castes = ["Any", "Syed", "Rajput", "Mughal", "Arain", "Jat", "Sheikh", "Pathan", "Baloch", "Malik", "Other"];
 const educationOptions = ["Any", "Matric", "Intermediate", "Bachelors", "Masters", "PhD", "Islamic Scholar"];
@@ -39,6 +40,7 @@ const defaultFilters = {
   ageRange: [18, 55],
   city: "any",
   country: "any",
+  state: "any",
   sect: "any",
   caste: "any",
   education: "any",
@@ -71,7 +73,7 @@ const SearchPage = () => {
     if (urlCaste) initial.caste = urlCaste.toLowerCase();
     if (urlSect) initial.sect = urlSect.toLowerCase();
     if (urlCity) initial.city = urlCity.toLowerCase();
-    if (urlState) initial.city = urlState.toLowerCase();
+    if (urlState) initial.state = urlState.toLowerCase();
     const hasUrlFilter = urlMarital || urlCaste || urlSect || urlState || urlCity;
     if (hasUrlFilter) initial.searchText = "";
     return initial;
@@ -84,6 +86,7 @@ const SearchPage = () => {
     let count = 0;
     if (filters.city !== "any") count++;
     if (filters.country !== "any") count++;
+    if (filters.state !== "any") count++;
     if (filters.sect !== "any") count++;
     if (filters.caste !== "any") count++;
     if (filters.education !== "any") count++;
@@ -116,16 +119,19 @@ const SearchPage = () => {
     enabled: !!userEmail,
   });
 
-  const { data: dbProfiles = [], isLoading } = useQuery({
+  const { data: dbProfiles = [], isLoading, isError } = useQuery({
     queryKey: ["search-profiles"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("*")
         .eq("profile_completed", true)
-        .or("is_married.is.null,is_married.eq.false");
+        .eq("show_in_search", true)
+        .eq("is_banned", false)
+        .eq("is_married", false);
       return data || [];
     },
+    enabled: isAuthenticated,
   });
 
   // Filter out own profile and profiles that hide from current user
@@ -188,6 +194,8 @@ const SearchPage = () => {
       if (age !== null && (age < filters.ageRange[0] || age > filters.ageRange[1])) return false;
       // City
       if (filters.city !== "any" && p.city?.toLowerCase() !== filters.city) return false;
+      // State / province
+      if (filters.state !== "any" && p.state?.toLowerCase() !== filters.state) return false;
       // Country
       if (filters.country !== "any" && p.country?.toLowerCase() !== filters.country) return false;
       // Sect
@@ -209,6 +217,7 @@ const SearchPage = () => {
       if (!matchesHeight(p.height, filters.height)) return false;
       // Willing to relocate
       if (filters.willingToRelocate && !p.willing_to_relocate) return false;
+      if (filters.withPhotoOnly && !p.has_photo) return false;
       // Verified only
       if (filters.verifiedOnly && !p.is_verified) return false;
       // In-person verified
@@ -284,7 +293,8 @@ const SearchPage = () => {
             <button
               key={tab.value}
               onClick={() => updateFilter("searchType", tab.value)}
-              className={filters.searchType === tab.value ? "pill-active" : "pill-inactive"}
+            className={filters.searchType === tab.value ? "pill-active" : "pill-inactive"}
+            aria-pressed={filters.searchType === tab.value}
             >
               {tab.label}
             </button>
@@ -292,6 +302,8 @@ const SearchPage = () => {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`pill-inactive ml-auto flex items-center gap-token-2 ${activeFilterCount > 0 ? "ring-2 ring-primary/30" : ""}`}
+            aria-expanded={showFilters}
+            aria-controls="advanced-search-filters"
           >
             <FiFilter style={{ fontSize: "var(--size-icon-sm)" }} />
             {showFilters ? "Hide" : "Show"} Filters
@@ -333,7 +345,7 @@ const SearchPage = () => {
             <div className="search-input-wrapper">
               <HiOutlineLocationMarker className="search-input-icon" style={{ fontSize: "var(--size-icon)" }} />
               <Input
-                placeholder="Search by name, city, caste, profession..."
+                placeholder="Search name, city, caste..."
                 className="pl-10"
                 value={filters.searchText}
                 onChange={(e) => updateFilter("searchText", e.target.value)}
@@ -427,6 +439,7 @@ const SearchPage = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
+              id="advanced-search-filters"
             >
               <Card className="mb-token-6">
                 <CardContent className="p-token-6">
@@ -452,6 +465,7 @@ const SearchPage = () => {
                     </div>
 
                     <FilterSelect label="Country" value={filters.country} onChange={(v) => updateFilter("country", v)} options={countries} />
+                    <FilterSelect label="State / Province" value={filters.state} onChange={(v) => updateFilter("state", v)} options={states} />
                     <FilterSelect label="City" value={filters.city} onChange={(v) => updateFilter("city", v)} options={cities} />
                     <FilterSelect label="Sect / Maslak" value={filters.sect} onChange={(v) => updateFilter("sect", v)} options={sects} />
                     <FilterSelect label="Caste / Tribe" value={filters.caste} onChange={(v) => updateFilter("caste", v)} options={castes} />
@@ -476,6 +490,10 @@ const SearchPage = () => {
                       <Label className="text-token-xs text-muted-foreground">Willing to Relocate</Label>
                       <Switch checked={filters.willingToRelocate} onCheckedChange={(v) => updateFilter("willingToRelocate", v)} />
                     </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <Label className="text-token-xs text-muted-foreground">With Photo</Label>
+                      <Switch checked={filters.withPhotoOnly} onCheckedChange={(v) => updateFilter("withPhotoOnly", v)} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -484,8 +502,21 @@ const SearchPage = () => {
         </AnimatePresence>
 
         {/* Results */}
-        {isLoading ? (
+        {!isAuthenticated ? (
+          <div className="empty-state">
+            <p className="empty-state-title">Sign in to browse profiles</p>
+            <p className="empty-state-text">Create an account or sign in to search verified proposals.</p>
+            <Button variant="hero" size="sm" asChild className="mt-token-3">
+              <Link to="/login">Sign In</Link>
+            </Button>
+          </div>
+        ) : isLoading ? (
           <div className="empty-state"><p className="text-body-muted">Loading profiles...</p></div>
+        ) : isError ? (
+          <div className="empty-state">
+            <p className="empty-state-title">Search is temporarily unavailable</p>
+            <p className="empty-state-text">Please try again in a moment.</p>
+          </div>
         ) : (
           <>
             <p className="text-body-muted mb-token-4">Showing {withScores.length} proposals — sorted by compatibility</p>

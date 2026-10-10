@@ -47,14 +47,14 @@ const Login = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
+          <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" {...register("email")} className="mt-token-1" />
           {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
           <div className="relative mt-token-1">
-            <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" {...register("password")} />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">
+            <Input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="••••••••" {...register("password")} />
+            <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(!showPassword)} className="password-toggle">
               {showPassword ? <FiEyeOff style={{ fontSize: "var(--size-icon)" }} /> : <FiEye style={{ fontSize: "var(--size-icon)" }} />}
             </button>
           </div>
