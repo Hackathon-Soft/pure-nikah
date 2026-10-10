@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -92,6 +92,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       flagged_messages: {
@@ -143,21 +150,18 @@ export type Database = {
         Row: {
           created_at: string
           hidden_email: string
-          hidden_user_id: string | null
           id: string
           profile_owner_id: string
         }
         Insert: {
           created_at?: string
           hidden_email: string
-          hidden_user_id?: string | null
           id?: string
           profile_owner_id: string
         }
         Update: {
           created_at?: string
           hidden_email?: string
-          hidden_user_id?: string | null
           id?: string
           profile_owner_id?: string
         }
@@ -342,6 +346,33 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_photos: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          privacy: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          privacy?: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          privacy?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_views: {
         Row: {
           created_at: string
@@ -382,13 +413,14 @@ export type Database = {
           father_occupation: string | null
           first_name: string
           gender: string | null
+          has_photo: boolean
           height: string | null
           hijab_beard: string | null
           id: string
           in_person_verified: boolean | null
           income_range: string | null
           is_banned: boolean | null
-          is_married: boolean | null
+          is_married: boolean
           is_verified: boolean | null
           islamic_values: string | null
           languages: string[] | null
@@ -418,6 +450,7 @@ export type Database = {
           show_online_status: boolean | null
           siblings: string | null
           smoking: string | null
+          state: string | null
           updated_at: string
           user_id: string
           willing_to_relocate: boolean | null
@@ -440,13 +473,14 @@ export type Database = {
           father_occupation?: string | null
           first_name?: string
           gender?: string | null
+          has_photo?: boolean
           height?: string | null
           hijab_beard?: string | null
           id?: string
           in_person_verified?: boolean | null
           income_range?: string | null
           is_banned?: boolean | null
-          is_married?: boolean | null
+          is_married?: boolean
           is_verified?: boolean | null
           islamic_values?: string | null
           languages?: string[] | null
@@ -476,6 +510,7 @@ export type Database = {
           show_online_status?: boolean | null
           siblings?: string | null
           smoking?: string | null
+          state?: string | null
           updated_at?: string
           user_id: string
           willing_to_relocate?: boolean | null
@@ -498,13 +533,14 @@ export type Database = {
           father_occupation?: string | null
           first_name?: string
           gender?: string | null
+          has_photo?: boolean
           height?: string | null
           hijab_beard?: string | null
           id?: string
           in_person_verified?: boolean | null
           income_range?: string | null
           is_banned?: boolean | null
-          is_married?: boolean | null
+          is_married?: boolean
           is_verified?: boolean | null
           islamic_values?: string | null
           languages?: string[] | null
@@ -534,6 +570,7 @@ export type Database = {
           show_online_status?: boolean | null
           siblings?: string | null
           smoking?: string | null
+          state?: string | null
           updated_at?: string
           user_id?: string
           willing_to_relocate?: boolean | null
@@ -619,35 +656,35 @@ export type Database = {
         Row: {
           couple_names: string
           created_at: string
+          created_by: string | null
           id: string
           is_approved: boolean
           location: string | null
-          rating: number | null
+          rating: number
           review: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           couple_names: string
           created_at?: string
+          created_by?: string | null
           id?: string
           is_approved?: boolean
           location?: string | null
-          rating?: number | null
+          rating?: number
           review: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           couple_names?: string
           created_at?: string
+          created_by?: string | null
           id?: string
           is_approved?: boolean
           location?: string | null
-          rating?: number | null
+          rating?: number
           review?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -772,7 +809,108 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          bio: string | null
+          caste: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          education: string | null
+          first_name: string | null
+          gender: string | null
+          has_photo: boolean | null
+          height: string | null
+          id: string | null
+          in_person_verified: boolean | null
+          is_banned: boolean | null
+          is_married: boolean | null
+          is_verified: boolean | null
+          languages: string[] | null
+          last_name: string | null
+          marital_status: string | null
+          photo_privacy: string | null
+          preferred_age_max: number | null
+          preferred_age_min: number | null
+          profession: string | null
+          profile_completed: boolean | null
+          religious_practice: string | null
+          sect: string | null
+          show_in_search: boolean | null
+          state: string | null
+          updated_at: string | null
+          user_id: string | null
+          willing_to_relocate: boolean | null
+        }
+        Insert: {
+          bio?: string | null
+          caste?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          education?: string | null
+          first_name?: string | null
+          gender?: string | null
+          has_photo?: boolean | null
+          height?: string | null
+          id?: string | null
+          in_person_verified?: boolean | null
+          is_banned?: boolean | null
+          is_married?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          last_name?: string | null
+          marital_status?: string | null
+          photo_privacy?: string | null
+          preferred_age_max?: number | null
+          preferred_age_min?: number | null
+          profession?: string | null
+          profile_completed?: boolean | null
+          religious_practice?: string | null
+          sect?: string | null
+          show_in_search?: boolean | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          willing_to_relocate?: boolean | null
+        }
+        Update: {
+          bio?: string | null
+          caste?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          education?: string | null
+          first_name?: string | null
+          gender?: string | null
+          has_photo?: boolean | null
+          height?: string | null
+          id?: string | null
+          in_person_verified?: boolean | null
+          is_banned?: boolean | null
+          is_married?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          last_name?: string | null
+          marital_status?: string | null
+          photo_privacy?: string | null
+          preferred_age_max?: number | null
+          preferred_age_min?: number | null
+          profession?: string | null
+          profile_completed?: boolean | null
+          religious_practice?: string | null
+          sect?: string | null
+          show_in_search?: boolean | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          willing_to_relocate?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
@@ -800,12 +938,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -829,11 +967,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -854,11 +992,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -879,11 +1017,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -896,11 +1034,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
