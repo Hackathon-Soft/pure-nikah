@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FiMail, FiRefreshCw } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,7 +10,13 @@ const VerifyEmail = () => {
   const [resending, setResending] = useState(false);
   const { toast } = useToast();
   const location = useLocation();
-  const email = location.state?.email;
+  const email = location.state?.email || sessionStorage.getItem("pendingVerificationEmail") || "";
+
+  useEffect(() => {
+    if (location.state?.email) {
+      sessionStorage.setItem("pendingVerificationEmail", location.state.email);
+    }
+  }, [location.state?.email]);
 
   const handleResend = async () => {
     if (!email) {
@@ -18,12 +24,16 @@ const VerifyEmail = () => {
       return;
     }
     setResending(true);
-    const { error } = await supabase.auth.resend({ type: "signup", email });
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
     setResending(false);
     if (error) {
       toast({ title: "Failed to resend", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Email resent", description: "Please check your inbox." });
+      toast({ title: "Email resent", description: "Please check your inbox and spam folder." });
     }
   };
 
