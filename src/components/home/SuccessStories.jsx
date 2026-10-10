@@ -85,10 +85,10 @@ const SuccessStories = () => {
             </div>
           </div>
 
-          <button onClick={scrollPrev} className="carousel-nav-prev" aria-label="Previous">
+          <button onClick={scrollPrev} className="carousel-nav-prev" aria-label="Previous success story">
             <FiChevronLeft style={{ fontSize: "var(--size-icon)" }} />
           </button>
-          <button onClick={scrollNext} className="carousel-nav-next" aria-label="Next">
+          <button onClick={scrollNext} className="carousel-nav-next" aria-label="Next success story">
             <FiChevronRight style={{ fontSize: "var(--size-icon)" }} />
           </button>
         </div>

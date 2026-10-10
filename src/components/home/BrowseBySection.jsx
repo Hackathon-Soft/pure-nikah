@@ -4,7 +4,7 @@ const categories = {
   "Marital Status": ["Never Married", "Divorced", "Separated", "Widowed"],
   "Caste": ["Syed", "Sheikh", "Mughal", "Pathan", "Rajput", "Arain", "Jatt", "Other"],
   "Sect": ["Sunni", "Shia", "Deobandi", "Barelvi", "Ahl-e-Hadith", "Other"],
-  "State": ["Punjab", "Sindh", "KPK", "Balochistan", "Islamabad", "AJK", "Gilgit-Baltistan"],
+  "State": ["Punjab", "Sindh", "Khyber Pakhtunkhwa", "Balochistan", "Islamabad", "Azad Jammu and Kashmir", "Gilgit-Baltistan"],
   "City": ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta"],
 };
 
@@ -42,7 +42,7 @@ const BrowseBySection = () => {
           {categories[active].map((item, i) => (
             <span key={item} className="flex items-center">
               <a
-                href={`/search?${active.toLowerCase().replace(/\s/g, "_")}=${encodeURIComponent(item)}`}
+                href={`/search?${active === "State" ? "state" : active.toLowerCase().replace(/\s/g, "_")}=${encodeURIComponent(item)}`}
                 className="text-muted-foreground hover:text-primary transition-colors text-sm md:text-base px-3 py-1"
               >
                 {item}
