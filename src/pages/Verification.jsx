@@ -167,7 +167,14 @@ const Verification = () => {
       setRejectionReason("");
       toast({ title: "Submitted", description: "Your verification is under review. We'll notify you within 24-48 hours." });
     } catch (error) {
-      toast({ title: "Submission failed", description: error.message || "Please try again.", variant: "destructive" });
+      const duplicateIdentity = error.code === "23505";
+      toast({
+        title: duplicateIdentity ? "Identity already registered" : "Submission failed",
+        description: duplicateIdentity
+          ? "This CNIC or phone number is already linked to an account or active verification request."
+          : (error.message || "Please try again."),
+        variant: "destructive",
+      });
     } finally {
       setIsUploading(false);
     }
