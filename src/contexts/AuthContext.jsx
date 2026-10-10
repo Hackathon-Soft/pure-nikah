@@ -5,6 +5,8 @@ const AuthContext = createContext({});
 
 export const useAuth = () => useContext(AuthContext);
 
+const getAuthRedirectUrl = (path = "") => `${window.location.origin}${path}`;
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -68,7 +70,7 @@ export const AuthProvider = ({ children }) => {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: getAuthRedirectUrl(),
       },
     });
     return { data, error };
@@ -94,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
   const resetPassword = async (email) => {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getAuthRedirectUrl("/reset-password"),
     });
     return { data, error };
   };
