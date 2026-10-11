@@ -11,6 +11,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { runtimeConfig } from "@/lib/runtimeConfig";
 
 const registerSchema = yup.object({
   registrationType: yup.string().required(),
@@ -55,7 +56,12 @@ const Register = () => {
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Account created!", description: "Please check your email to verify your account." });
+      toast({
+        title: "Account created!",
+        description: runtimeConfig.devSkipEmailVerification
+          ? "Development email-skip mode is enabled. Local Supabase confirmations must also be disabled."
+          : "Please check your email to verify your account.",
+      });
       navigate("/verify-email", { state: { email: data?.user?.email || data.email } });
     }
   };

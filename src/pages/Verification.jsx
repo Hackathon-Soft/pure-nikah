@@ -9,8 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { FiShield, FiUpload, FiCheckCircle, FiClock, FiAlertCircle, FiUser, FiCamera } from "react-icons/fi";
+import { FiShield, FiUpload, FiCheckCircle, FiClock, FiAlertCircle, FiUser, FiCamera, FiRefreshCw } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi";
+import { runtimeConfig } from "@/lib/runtimeConfig";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -50,9 +51,11 @@ const Verification = () => {
   const [selfie, setSelfie] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [extractedText, setExtractedText] = useState("");
   const { toast } = useToast();
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     resolver: yupResolver(verificationSchema),
   });
 
@@ -100,6 +103,35 @@ const Verification = () => {
 
     if (error) throw error;
     return path;
+  };
+
+  const scanCnic = async () => {
+    if (!cnicFront) {
+      toast({ title: "Choose the CNIC front first", description: "Upload a clear image before scanning.", variant: "destructive" });
+      return;
+    }
+    if (!runtimeConfig.cnicOcrEnabled) {
+      toast({ title: "CNIC scanning is not configured", description: "Set VITE_CNIC_OCR_ENABLED=true and configure the OCR function secret.", variant: "destructive" });
+      return;
+    }
+    try {
+      setOcrLoading(true);
+      const bytes = new Uint8Array(await cnicFront.arrayBuffer());
+      let binary = "";
+      bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+      const base64 = btoa(binary);
+      const { data, error } = await supabase.functions.invoke("extract-document-text", {
+        body: { base64, mimeType: cnicFront.type },
+      });
+      if (error || data?.error) throw new Error(data?.error || error?.message || "OCR failed");
+      setExtractedText(data.text || "");
+      if (data.extracted?.cnicNumber) setValue("cnicNumber", data.extracted.cnicNumber, { shouldValidate: true });
+      toast.success(data.extracted?.cnicNumber ? "CNIC number detected. Review it before submitting." : "Text extracted. Review the fields before submitting.");
+    } catch (error) {
+      toast({ title: "Unable to scan document", description: error.message, variant: "destructive" });
+    } finally {
+      setOcrLoading(false);
+    }
   };
 
   const onSubmit = async (formData) => {
@@ -249,6 +281,19 @@ const Verification = () => {
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => setCnicBack(e.target.files?.[0] || null)} />
                 </label>
               </div>
+              <div className="flex flex-wrap items-center gap-3 mb-token-4">
+                <Button type="button" variant="outline" onClick={scanCnic} disabled={!cnicFront || ocrLoading}>
+                  <FiRefreshCw className={ocrLoading ? "mr-2 animate-spin" : "mr-2"} />
+                  {ocrLoading ? "Scanning…" : "Scan CNIC & extract text"}
+                </Button>
+                <span className="text-token-xs text-muted-foreground">Text is extracted for review; it is never accepted as proof automatically.</span>
+              </div>
+              {extractedText && (
+                <div className="mb-token-4 rounded-lg border border-border bg-muted p-3">
+                  <p className="text-token-xs font-semibold text-foreground mb-1">Extracted text preview</p>
+                  <p className="text-token-xs text-muted-foreground whitespace-pre-wrap break-words max-h-28 overflow-auto">{extractedText}</p>
+                </div>
+              )}
               <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-token-6 cursor-pointer transition-colors ${selfie ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                 <FiCamera className="text-muted-foreground mb-token-2" style={{ fontSize: "var(--size-icon-lg)" }} /><span className="text-token-sm font-medium text-foreground">{selfie ? selfie.name : "Selfie holding your CNIC"}</span><span className="text-token-xs text-muted-foreground mt-token-1">Take a clear selfie while holding your CNIC next to your face</span>
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => setSelfie(e.target.files?.[0] || null)} />
