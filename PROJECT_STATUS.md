@@ -26,6 +26,8 @@
 - Server-side admin role checks and RLS/security hardening.
 - Contact form now stores messages in Supabase instead of simulating submission.
 - Nearby Matches page uses the user's city while keeping precise location private.
+- CNIC document scanning can extract text and detect the CNIC number for user review.
+- Duplicate phone/CNIC safeguards are enforced by database indexes.
 
 ### Authentication and Email
 - The application environment now points to the same Supabase project that contains the schema and functions.
@@ -45,9 +47,22 @@ These items require provider credentials or a business decision and cannot be sa
 
 - Custom SMTP provider for reliable production email delivery. Supabase's built-in sender is suitable for testing but rate-limited/best-effort.
 - Twilio secrets for real phone OTP delivery: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_PHONE_NUMBER`.
+- `OCR_SPACE_API_KEY` for the deployed `extract-document-text` function. OCR output is advisory only and never auto-approves identity.
 - Supabase Auth Redirect URLs for localhost and production domains.
 - Payment provider credentials and webhook configuration if premium payments are enabled.
 - Production domain, analytics, and transactional-email branding.
+
+### Local-only development switches
+
+The following `.env` flags are restricted by code to Vite development builds:
+
+```text
+VITE_DEV_SKIP_EMAIL_VERIFICATION=false
+VITE_DEV_SKIP_PHONE_VERIFICATION=false
+VITE_CNIC_OCR_ENABLED=false
+```
+
+The email flag only skips the app's verification screen. Supabase Auth still controls whether an account is confirmed; for a fully local test project, disable email confirmations in the local Supabase configuration. The phone flag is a UI-only mock and never marks a production profile as verified.
 
 ## ✅ Verification performed
 
