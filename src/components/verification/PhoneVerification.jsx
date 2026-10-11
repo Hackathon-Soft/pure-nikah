@@ -9,6 +9,7 @@ import { FiPhone, FiCheckCircle, FiSend, FiShield, FiRefreshCw } from "react-ico
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { runtimeConfig } from "@/lib/runtimeConfig";
 
 const PhoneVerification = () => {
   const { user, profile, fetchProfile } = useAuth();
@@ -17,6 +18,7 @@ const PhoneVerification = () => {
   const [step, setStep] = useState("phone"); // "phone" | "otp"
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [devVerified, setDevVerified] = useState(false);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -25,7 +27,7 @@ const PhoneVerification = () => {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  const isVerified = profile?.phone_verified && profile?.phone_number === phone;
+  const isVerified = (profile?.phone_verified && profile?.phone_number === phone) || devVerified;
 
   const handleSendOTP = async () => {
     if (!phone.trim()) return toast.error("Please enter your phone number");
@@ -34,6 +36,12 @@ const PhoneVerification = () => {
     }
     setLoading(true);
     try {
+      if (runtimeConfig.devSkipPhoneVerification) {
+        setDevVerified(true);
+        setStep("phone");
+        toast.success("Development phone-skip mode enabled. No SMS was sent.");
+        return;
+      }
       const { data: { session } } = await supabase.auth.getSession();
       const { data, error } = await supabase.functions.invoke("send-otp", {
         body: { phoneNumber: phone.trim() },
@@ -78,7 +86,7 @@ const PhoneVerification = () => {
           <h2 className="card-section-title flex items-center gap-token-2">
             <FiPhone className="text-primary" /> Phone Verification
           </h2>
-          {profile?.phone_verified ? (
+          {isVerified ? (
             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
               <FiCheckCircle className="mr-1" /> Verified
             </Badge>
